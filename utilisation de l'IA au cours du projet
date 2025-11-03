@@ -1,2 +1,6 @@
 Séance 1 :
   pas d'utilisation de l'IA lors de la séance (qui aurait pu servir à implméneter l'algorithme de Wilson).
+
+Séance 2: 
+  Utilisation de ChatGPT pour manier la bibliothèque pygame (plus facile que de lire toute la documentation).
+  Et aussi pour créer quelques fonctions peu intéréssantes comme direction ou afficher_comme_texte
