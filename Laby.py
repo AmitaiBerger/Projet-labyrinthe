@@ -10,6 +10,9 @@ class Case():
         # l'indice 0 est la droite, 1 le haut, 2 la gauche et 3 le bas.
         self.contenu = None# pour l'instant inutile, mais poura contenir des éléments graphiques cosmétiques
         self.i = indice
+        self.visibles = {} #Liste des cases visibles c a d les cases sans murs alignees
+
+
     
 
 
@@ -118,10 +121,39 @@ class Labyrinthe():
                             if len(CaseActu.voisins)==0:
                                 if j==Casee.j:
                                     CaseActu.voisins.append(Casee)
+
             
                 
         print("labyrinthe généré")
             #connecte = not(self.indices_voisins(caseActu).issubset(cases_non_generees))
+
+    def visibles(self):
+        vision = {}
+        for case in self.cases:
+            vision["droite"] = []
+            vision["haut"] = []
+            vision["bas"] = []
+            vision["gauche"] = []
+            position = case.i
+            while self.cases[position].voisins[0] == True:
+                vision["droite"].append(position)
+                position += 1
+            position = case.i
+            while self.cases[position].voisins[0] == True:
+                vision["haut"].append(position)
+                position -= self.largeur
+            position = case.i
+            while self.cases[position].voisins[0] == True:
+                vision["gauche"].append(position)
+                position -= 1
+            position = case.i
+            while self.cases[position].voisins[0] == True:
+                vision["bas"].append(position)
+                position += self.largeur
+            case.visibles = vision
+    
+            
+
 
 
 
