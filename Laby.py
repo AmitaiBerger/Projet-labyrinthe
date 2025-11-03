@@ -1,6 +1,7 @@
 import random
 
 
+
 class Case():
     #voisins = [None,None,None,None]
     #contenu = None
@@ -79,7 +80,7 @@ class Labyrinthe():
                 voisins = self.indices_voisins(caseActu)
                 prochain = random.choice(voisins)
                 if(prochain in cheminActu):# si on fait une boucle, on supprime
-                    chemin = chemin[:chemin.index(prochain)+1]
+                    cheminActu = cheminActu[:cheminActu.index(prochain)+1]
                 else:
                     cheminActu.append(prochain)
                 caseActu = prochain
