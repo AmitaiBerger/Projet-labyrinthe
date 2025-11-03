@@ -126,9 +126,8 @@ class Labyrinthe():
         print("generation par Wilson")
         cases_non_generees = [i for i in range(self.largeur*self.hauteur)]# indice des cases pas encore partie du Laby
         self.cases.append(Case(random.choice(cases_non_generees)))# on prend un point au hasard pour appartenir au Laby
-        print("premiere case du Labyrinthe :",self.cases[0])
+        print("premiere case du Labyrinthe :",self.cases[0].i)
         cases_non_generees.remove(self.cases[0].i)
-        print("premiere case du Laby :",self.cases[0])
         while(len(self.cases)<self.hauteur*self.largeur):
             print("génération d'une branche")
             # génération de la premiere case de la branche
@@ -185,15 +184,15 @@ class Labyrinthe():
                 vision["droite"].append(position)
                 position += 1
             position = case.i
-            while self.cases[position].voisins[0] == True:
+            while self.cases[position].voisins[1] == True:
                 vision["haut"].append(position)
                 position -= self.largeur
             position = case.i
-            while self.cases[position].voisins[0] == True:
+            while self.cases[position].voisins[2] == True:
                 vision["gauche"].append(position)
                 position -= 1
             position = case.i
-            while self.cases[position].voisins[0] == True:
+            while self.cases[position].voisins[3] == True:
                 vision["bas"].append(position)
                 position += self.largeur
             case.visibles = vision
