@@ -20,6 +20,47 @@ class Labyrinthe():
         self.cases = []
         self.largeur=largeur
         self.hauteur=hauteur
+
+    def afficher_comme_texte(self):# généré par IA parce que peu intérressant et laborieux
+        """affiche le labyrinthe sous forme de texte dans la console
+        utile pour le debug"""
+        print("affichage du labyrinthe")
+        for h in range(self.hauteur):
+            # ligne du haut
+            ligne_haut = ""
+            for l in range(self.largeur):
+                ligne_haut += "+"
+                if self.cases[h*self.largeur+l].voisins[1] != None:
+                    ligne_haut += "   "
+                else:
+                    ligne_haut += "---"
+            ligne_haut += "+"
+            print(ligne_haut)
+
+            # ligne du milieu
+            ligne_milieu = ""
+            for l in range(self.largeur):
+                if self.cases[h*self.largeur+l].voisins[2] != None:
+                    ligne_milieu += " "
+                else:
+                    ligne_milieu += "|"
+                ligne_milieu += "   "
+            if self.cases[h*self.largeur+self.largeur-1].voisins[0] != None:
+                ligne_milieu += " "
+            else:
+                ligne_milieu += "|"
+            print(ligne_milieu)
+        # ligne du bas
+        ligne_bas = ""
+        for l in range(self.largeur):
+            ligne_bas += "+"
+            if self.cases[(self.hauteur-1)*self.largeur+l].voisins[3] != None:
+                ligne_bas += "   "
+            else:
+                ligne_bas += "---"
+        ligne_bas += "+"
+        print(ligne_bas)
+
     
     def directions_voisines(self,indice_centre:int):
         """renvoie la liste directions possibles à partir d'une case donnée
@@ -55,6 +96,25 @@ class Labyrinthe():
             vois.append(indice_centre+self.largeur)
         return vois
     
+    def direction(self,indiceA,indiceB):# généré par IA, utile pour la fonction Wilson
+        """renvoie la direction de B par rapport à A
+           droite : 0
+           haut : 1
+           gauche : 2
+           bas : 3
+           """
+        if indiceB == indiceA+1:
+            return 0
+        elif indiceB == indiceA-1:
+            return 2
+        elif indiceB == indiceA-self.largeur:
+            return 1
+        elif indiceB == indiceA+self.largeur:
+            return 3
+        else:
+            return None
+
+
     def generer_par_Wilson(self):
         """crée un labyrinthe avec l'algorithme de Wilson.
         documentaiton en anglais :
@@ -89,11 +149,17 @@ class Labyrinthe():
             for i in range(len(cheminActu)-1):
                 if not any(c.i == cheminActu[i] for c in self.cases):
                     self.cases.append(Case(cheminActu[i]))
-                    self.cases[-1].voisins.append(cheminActu[i+1])
+                    #on connecte au suivant
+                    dir = self.direction(cheminActu[i],cheminActu[i+1])
+                    self.cases[-1].voisins[dir] = True
                     if(i>0):
+                        #on connecte au précédent
                         self.cases[-1].voisins.append(cheminActu[i-1])
+                        dir = self.direction(cheminActu[i],cheminActu[i-1])
+                        self.cases[-1].voisins[dir] = True
             self.cases.append(Case(cheminActu[-1]))
-            self.cases[-1].voisins.append(cheminActu[-2])
+            dir = self.direction(cheminActu[-1],cheminActu[-2])
+            self.cases[-1].voisins[dir] = True
 
             # enlever les cases de cases_non_generees :
             for case in cheminActu:
