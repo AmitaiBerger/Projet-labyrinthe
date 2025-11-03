@@ -1,22 +1,58 @@
+import pygame
 
-def class Joueur:
+class Joueur:
     """
-    Le joueur a à chaque instant une couleur, une case et une 
-    direction qui peut etre droite gauche haut bas ou rien
-    (qui correspondront à des constantes de pygame)
+    Le joueur a à chaque instant une couleur, une case (de la classe Case),une direction
+    (0,1,2,3 correspondant à la meme chose que dans Case, ou 4 pour la direction nulle),
+    et un running pour signaler s'il faut stopper le jeu
     """
-    def__init__(self,case,color,direction,vision):
+    def__init__(self,labyrinthe,case,color,direction,running):
         self._case=case
         self._color=color
         self._direction=direction
-        self._vision=vision
+        self._running=True
         
-    def deplacement(self):
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-            elif event.type == pygame.KEYDOWN:
-                if event.key==K_DOWN
-                    direction
+    def changement_direction(self)->None:
+        """
+        On détecte les cases pressées, si deux cases sont pressées à la fois 
+        """
+        keys = pygame.key.get_pressed()
+        if pygame.event.get()[0].type == pygame.QUIT:
+            self._running = False
+        elif not any(keys) or len(pygame.event.get())>1:
+                self._direction = 4
+        elif event.type == pygame.KEYDOWN:
+            match event.key:
+                case K_RIGHT:
+                    self._direction=0
+                case K_UP:
+                    self._direction=1
+                case K_LEFT:
+                    self._direction=2
+                case K_DOWN:
+                    self._direction=3
+                case _:
+                    self.direction=4
+
+                
                     
+    def deplacement(self)->None:
+        """
+        Dans le cas où le joueur a cliqué sur une flèche du clavier, 
+        on change la case sur laquelle il est selon la direction qu'il prend
+        en vérifiant d'abord si cette case est accessible
+        """
+        if self.direction==4:
+            return None
+        if self.case[self.direction]:
+            match direction:
+                case 0:
+                    self._case=labyrinthe.cases[self._case.i+1]
+                case 1:
+                    self._case=labyrinthe.cases[self._case.i-labyrinthe.largeur]
+                case 2:
+                    self._case=labyrinthe.cases[self._case.i-1]
+                case 3:
+                    self._case=labyrinthe.cases[self._case.i+labyrinthe.largeur]
+
                     
