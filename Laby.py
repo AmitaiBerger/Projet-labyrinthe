@@ -1,6 +1,7 @@
 import random
 
 
+
 class Case():
     #voisins = [None,None,None,None]
     #contenu = None
@@ -76,48 +77,28 @@ class Labyrinthe():
                 voisins = self.indices_voisins(caseActu)
                 prochain = random.choice(voisins)
                 if(prochain in cheminActu):# si on fait une boucle, on supprime
-                    chemin = chemin[:chemin.index(prochain)+1]
+                    cheminActu = cheminActu[:cheminActu.index(prochain)+1]
                 else:
                     cheminActu.append(prochain)
                 caseActu = prochain
 
             # on a trouvé un chemin qui rejoint le labyrinthe
             print("chemin trouvé :",cheminActu)
-            
 
+            # On ajoute le chemin au labyrinthe
+            for i in range(len(cheminActu)-1):
+                if not any(c.i == cheminActu[i] for c in self.cases):
+                    self.cases.append(Case(cheminActu[i]))
+                    self.cases[-1].voisins.append(cheminActu[i+1])
+                    if(i>0):
+                        self.cases[-1].voisins.append(cheminActu[i-1])
+            self.cases.append(Case(cheminActu[-1]))
+            self.cases[-1].voisins.append(cheminActu[-2])
 
-            if(set(self.indices_voisins(caseActu)).issubset(set(cases_non_generees))):
-                # si aucun des voisins n'est déjà dans le labyrinthe
-                connecte = False
-                cheminActu = [caseActu]
-                while not connecte:# on fait une marche aléatoire vers le Laby déjà généré
-                    prochain = random.choice(self.indices_voisins(cheminActu[len(cheminActu)-1]))
-                    if(prochain in cheminActu):# si on fait une boucle, on supprime la boucle
-                        for i in range(cheminActu.index(prochain)+1,len(cheminActu)-1):
-                            cheminActu.pop()
-                    elif(prochain in self.cases):# si on rejoint le labyrinthe
-                        casesCheminActu=[]
-                        for j in range(len(cheminActu)):
-                            casesCheminActu.append(Case(cheminActu[j]))
-                            cases_non_generees.remove(cheminActu[j])
-                        casesCheminActu[0].voisins.append(cheminActu[1])
-                        for i in range(1,len(cheminActu)-1):
-                            cheminActu[i].voisins.append(cheminActu[i+1])
-                            cheminActu[i].voisins.append(cheminActu[i-1])
-                        cheminActu[len(cheminActu)-1].voisins.append(cheminActu[i-2])
-                        self.cases = self.cases+cheminActu
-                        connecte=True
-                    else:
-                        cheminActu.append(prochain)
-            else:# alors un voisin de caseActu est deja dans le labyrinthe
-                CaseActu = Case(caseActu) # un crée un objet Case à la place de l'indice
-                self.cases.append(CaseActu)
-                for j in self.indices_voisins(caseActu):# on lui ajoute ses voisins
-                    if len(CaseActu.voisins)==0:
-                        for Casee in self.cases:
-                            if len(CaseActu.voisins)==0:
-                                if j==Casee.j:
-                                    CaseActu.voisins.append(Casee)
+            # enlever les cases de cases_non_generees :
+            for case in cheminActu:
+                if case in cases_non_generees:
+                    cases_non_generees.remove(case)
             
                 
         print("labyrinthe généré")
