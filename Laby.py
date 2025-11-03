@@ -6,8 +6,9 @@ class Case():
     #contenu = None
 
     def __init__(self,indice=0):
-        self.voisins = [None,None,None,None]# contient les objets Case voisines
-        self.contenu = None
+        self.voisins = [None,None,None,None]# booléens contenant True si la case et conectée à la voisine
+        # l'indice 0 est la droite, 1 le haut, 2 la gauche et 3 le bas.
+        self.contenu = None# pour l'instant inutile, mais poura contenir des éléments graphiques cosmétiques
         self.i = indice
     
 
@@ -65,15 +66,31 @@ class Labyrinthe():
         cases_non_generees.remove(self.cases[0].i)
         print("premiere case du Laby :",self.cases[0])
         while(len(self.cases)<self.hauteur*self.largeur):
-            print("génération d'une première branche")
-            #caseActu = random.choice(cases_non_generees)
-            caseActu = cases_non_generees.pop(random.randrange(0,len(cases_non_generees)))# choisit une case à relier au labyrinthe
+            print("génération d'une branche")
+            # génération de la premiere case de la branche
+            caseActu = random.choice(cases_non_generees)
+            
             print("à partir de :",caseActu)
+            cheminActu = [caseActu]
+            while caseActu in cases_non_generees:
+                voisins = self.indices_voisins(caseActu)
+                prochain = random.choice(voisins)
+                if(prochain in cheminActu):# si on fait une boucle, on supprime
+                    chemin = chemin[:chemin.index(prochain)+1]
+                else:
+                    cheminActu.append(prochain)
+                caseActu = prochain
+
+            # on a trouvé un chemin qui rejoint le labyrinthe
+            print("chemin trouvé :",cheminActu)
+            
+
+
             if(set(self.indices_voisins(caseActu)).issubset(set(cases_non_generees))):
                 # si aucun des voisins n'est déjà dans le labyrinthe
                 connecte = False
                 cheminActu = [caseActu]
-                while not connecte:# on crée un chemin aléatoire vers le Laby
+                while not connecte:# on fait une marche aléatoire vers le Laby déjà généré
                     prochain = random.choice(self.indices_voisins(cheminActu[len(cheminActu)-1]))
                     if(prochain in cheminActu):# si on fait une boucle, on supprime la boucle
                         for i in range(cheminActu.index(prochain)+1,len(cheminActu)-1):
@@ -82,6 +99,7 @@ class Labyrinthe():
                         casesCheminActu=[]
                         for j in range(len(cheminActu)):
                             casesCheminActu.append(Case(cheminActu[j]))
+                            cases_non_generees.remove(cheminActu[j])
                         casesCheminActu[0].voisins.append(cheminActu[1])
                         for i in range(1,len(cheminActu)-1):
                             cheminActu[i].voisins.append(cheminActu[i+1])
@@ -100,8 +118,7 @@ class Labyrinthe():
                             if len(CaseActu.voisins)==0:
                                 if j==Casee.j:
                                     CaseActu.voisins.append(Casee)
-            # dans tous les cas, on a ajouté le Case au labyrinthe, on doit donc l'enlever
-            # aux cases non générées
+            
                 
         print("labyrinthe généré")
             #connecte = not(self.indices_voisins(caseActu).issubset(cases_non_generees))
