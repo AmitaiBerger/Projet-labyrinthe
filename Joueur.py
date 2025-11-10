@@ -1,40 +1,46 @@
 import pygame
-import global_data
+from pygame.locals import K_RIGHT, K_UP, K_LEFT, K_DOWN
+
+from global_data import *
 
 
 class Joueur:
     """
     Le joueur a à chaque instant une couleur, une case (de la classe Case),une direction
-    (0,1,2,3 correspondant à la meme chose que dans Case, ou 4 pour la direction nulle),
+    (0,1,2,3 correspondant à la meme chose que dans Case),
     et un running pour signaler s'il faut stopper le jeu
     """
-    def __init__(self,labyrinthe,case,color,direction,running):
+    def __init__(self,labyrinthe,case,color,direction,speed):
         self._case = case
         self._color = color
-        self._direction = direction
+        self._direction = direction # Doit être initialisé à une direction valide
         self._running = True
+        self.speed = speed
         
-    def changement_direction(self)->None:
+    def changement_direction(self) -> None:
         """
-        On détecte les cases pressées, si deux cases sont pressées à la fois 
+        Met à jour la direction uniquement lors d'un nouvel appui sur une touche.
+        La direction est conservée même si la touche est relâchée.
         """
-        keys = pygame.key.get_pressed()
-        if pygame.event.get()[0].type == pygame.QUIT:
-            self._running = False
-        elif not any(keys) or len(pygame.event.get())>1:
-                self._direction = 4
-        elif pygame.event.type == pygame.KEYDOWN:
-            match pygame.event.key:
-                case K_RIGHT:
-                    self._direction = EST
-                case K_UP:
-                    self._direction = NORD
-                case K_LEFT:
-                    self._direction = OUEST
-                case K_DOWN:
-                    self._direction = SUD
-                case _:
-                    self.direction = 4
+        for event in pygame.event.get():
+            # 1. Gestion de la fermeture
+            if event.type == pygame.QUIT:
+                self._running = False
+                return
+
+            # 2. Changement de direction (seulement si une touche est ENFONCÉE)
+            if event.type == pygame.KEYDOWN:
+                match event.key:
+                    case K_RIGHT:
+                        self._direction = EST
+                    case K_UP:
+                        self._direction = NORD
+                    case K_LEFT:
+                        self._direction = OUEST
+                    case K_DOWN:
+                        self._direction = SUD
+                    # Si une autre touche est pressée, on ne fait rien, 
+                    # on garde l'ancienne direction.
 
                 
                     
