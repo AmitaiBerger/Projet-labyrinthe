@@ -8,5 +8,6 @@ if __name__=="__main__":
     Labyr.afficher_comme_texte()
     Labyr.visibles()
     print("vision  depuis la case 5,5 :", Labyr.cases[5*Labyr.largeur+5].visibles)
+    print("vision  depuis la case 4,4 :", Labyr.cases[4*Labyr.largeur+4].visibles)
 
     print("fin du programme")

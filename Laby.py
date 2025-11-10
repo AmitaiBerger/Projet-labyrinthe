@@ -20,11 +20,16 @@ class Case():
 class Labyrinthe():
 
     def __init__(self,hauteur:int,largeur:int):
-        self.cases = []
+        self.cases = [Case(i) for i in range(largeur * hauteur)]
         self.largeur=largeur
         self.hauteur=hauteur
 
-    def afficher_comme_texte(self):# généré par IA parce que peu intérressant et laborieux
+    def trier_cases(self):
+        """Trie le tableau self.cases selon l'attribut i de chaque case
+        pour que self.cases[k].i == k"""
+        self.cases.sort(key=lambda case: case.i)
+
+    def afficher_comme_texte(self):# généré par IA parce que peu intéressant et laborieux
         """affiche le labyrinthe sous forme de texte dans la console
         utile pour le debug"""
         print("affichage du labyrinthe")
@@ -74,7 +79,7 @@ class Labyrinthe():
            bas : 3
            """
 
-        print("directions voisins à ", indice_centre)
+        #print("directions voisins à ", indice_centre)
         directions = [] #
         if not (indice_centre%self.largeur==0):# (pas à gauche)
             directions.append(2)
@@ -86,8 +91,16 @@ class Labyrinthe():
             directions.append(3)
         return directions
 
+    def connecter_cases(self, indiceA, indiceB):
+        """Connecte deux cases adjacentes dans les deux sens"""
+        dir_A_vers_B = self.direction(indiceA, indiceB)
+        dir_B_vers_A = (dir_A_vers_B + 2) % 4
+        
+        self.cases[indiceA].voisins[dir_A_vers_B] = True
+        self.cases[indiceB].voisins[dir_B_vers_A] = True
+
     def indices_voisins(self,indice_centre:int):
-        print("indices voisins à ", indice_centre)
+        #print("indices voisins à ", indice_centre)
         vois = []
         if not (indice_centre%self.largeur<=0):# (pas à gauche)
             vois.append(indice_centre-1)
@@ -124,21 +137,25 @@ class Labyrinthe():
         https://en.wikipedia.org/wiki/Maze_generation_algorithm#Wilson's_algorithm
         """
         print("generation par Wilson")
-        cases_non_generees = [i for i in range(self.largeur*self.hauteur)]# indice des cases pas encore partie du Laby
-        self.cases.append(Case(random.choice(cases_non_generees)))# on prend un point au hasard pour appartenir au Laby
-        print("premiere case du Labyrinthe :",self.cases[0].i)
-        cases_non_generees.remove(self.cases[0].i)
-        while(len(self.cases)<self.hauteur*self.largeur):
+        
+        cases_dans_laby = set()
+        premiere = random.randrange(self.largeur * self.hauteur)
+        cases_dans_laby.add(premiere)
+        print("premiere case du Labyrinthe :", premiere)
+        cases_non_generees = set(range(self.largeur * self.hauteur)) - cases_dans_laby
+        while(cases_non_generees):
             print("génération d'une branche")
             # génération de la premiere case de la branche
-            caseActu = random.choice(cases_non_generees)
+            caseActu = random.choice(list(cases_non_generees))
             
             print("à partir de :",caseActu)
             cheminActu = [caseActu]
-            while caseActu in cases_non_generees:
+            while caseActu not in cases_dans_laby:
                 voisins = self.indices_voisins(caseActu)
                 prochain = random.choice(voisins)
+                print("prochain :",prochain)
                 if(prochain in cheminActu):# si on fait une boucle, on supprime
+                    print("boucle")
                     cheminActu = cheminActu[:cheminActu.index(prochain)+1]
                 else:
                     cheminActu.append(prochain)
@@ -149,52 +166,39 @@ class Labyrinthe():
 
             # On ajoute le chemin au labyrinthe
             for i in range(len(cheminActu)-1):
-                if not any(c.i == cheminActu[i] for c in self.cases):
-                    self.cases.append(Case(cheminActu[i]))
-                    #on connecte au suivant
-                    dir = self.direction(cheminActu[i],cheminActu[i+1])
-                    self.cases[-1].voisins[dir] = True
-                    if(i>0):
-                        #on connecte au précédent
-                        self.cases[-1].voisins.append(cheminActu[i-1])
-                        dir = self.direction(cheminActu[i],cheminActu[i-1])
-                        self.cases[-1].voisins[dir] = True
-            self.cases.append(Case(cheminActu[-1]))
-            dir = self.direction(cheminActu[-1],cheminActu[-2])
-            self.cases[-1].voisins[dir] = True
+                #if not any(c.i == cheminActu[i] for c in self.cases):
+                self.connecter_cases(cheminActu[i], cheminActu[i + 1])
+                cases_dans_laby.add(cheminActu[i])
+                cases_non_generees.discard(cheminActu[i])
+            #self.cases.append(Case(cheminActu[-1]))
+            #self.cases[-1].voisins[dir] = True
 
-            # enlever les cases de cases_non_generees :
-            for case in cheminActu:
-                if case in cases_non_generees:
-                    cases_non_generees.remove(case)
-            
-                
+        
         print("labyrinthe généré")
-            #connecte = not(self.indices_voisins(caseActu).issubset(cases_non_generees))
 
     def visibles(self):
-        vision = {}
         for case in self.cases:
+            vision = {}
             vision["droite"] = []
             vision["haut"] = []
-            vision["bas"] = []
             vision["gauche"] = []
+            vision["bas"] = []
             position = case.i
             while self.cases[position].voisins[0] == True:
-                vision["droite"].append(position)
                 position += 1
+                vision["droite"].append(position)
             position = case.i
             while self.cases[position].voisins[1] == True:
-                vision["haut"].append(position)
                 position -= self.largeur
+                vision["haut"].append(position)
             position = case.i
             while self.cases[position].voisins[2] == True:
-                vision["gauche"].append(position)
                 position -= 1
+                vision["gauche"].append(position)
             position = case.i
             while self.cases[position].voisins[3] == True:
-                vision["bas"].append(position)
                 position += self.largeur
+                vision["bas"].append(position)
             case.visibles = vision
     
             
