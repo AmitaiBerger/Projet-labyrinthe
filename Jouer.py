@@ -1,4 +1,6 @@
 import pygame
+import global
+
 
 class Joueur:
     """
@@ -6,11 +8,11 @@ class Joueur:
     (0,1,2,3 correspondant à la meme chose que dans Case, ou 4 pour la direction nulle),
     et un running pour signaler s'il faut stopper le jeu
     """
-    def__init__(self,labyrinthe,case,color,direction,running):
-        self._case=case
-        self._color=color
-        self._direction=direction
-        self._running=True
+    def __init__(self,labyrinthe,case,color,direction,running):
+        self._case = case
+        self._color = color
+        self._direction = direction
+        self._running = True
         
     def changement_direction(self)->None:
         """
@@ -21,18 +23,18 @@ class Joueur:
             self._running = False
         elif not any(keys) or len(pygame.event.get())>1:
                 self._direction = 4
-        elif event.type == pygame.KEYDOWN:
-            match event.key:
+        elif pygame.event.type == pygame.KEYDOWN:
+            match pygame.event.key:
                 case K_RIGHT:
-                    self._direction=0
+                    self._direction = EST
                 case K_UP:
-                    self._direction=1
+                    self._direction = NORD
                 case K_LEFT:
-                    self._direction=2
+                    self._direction = OUEST
                 case K_DOWN:
-                    self._direction=3
+                    self._direction = SUD
                 case _:
-                    self.direction=4
+                    self.direction = 4
 
                 
                     
@@ -42,17 +44,17 @@ class Joueur:
         on change la case sur laquelle il est selon la direction qu'il prend
         en vérifiant d'abord si cette case est accessible
         """
-        if self.direction==4:
+        if self.direction == 4:
             return None
         if self.case[self.direction]:
             match direction:
                 case 0:
-                    self._case=labyrinthe.cases[self._case.i+1]
+                    self._case = labyrinthe.cases[self._case.i+1]
                 case 1:
-                    self._case=labyrinthe.cases[self._case.i-labyrinthe.largeur]
+                    self._case = labyrinthe.cases[self._case.i-labyrinthe.largeur]
                 case 2:
-                    self._case=labyrinthe.cases[self._case.i-1]
+                    self._case = labyrinthe.cases[self._case.i-1]
                 case 3:
-                    self._case=labyrinthe.cases[self._case.i+labyrinthe.largeur]
+                    self._case = labyrinthe.cases[self._case.i+labyrinthe.largeur]
 
                     
