@@ -1,5 +1,5 @@
 import pygame
-import global
+import global_data
 
 
 class Joueur:
