@@ -44,7 +44,8 @@ if __name__=="__main__":
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONUP:
                 if rect.collidepoint(pygame.mouse.get_pos()):
-                    Fenetre()
+                    #fenetre()
+                    print("click")
         pygame.draw.rect(fenetre, (255, 255,255), rect)
         fenetre.blit(click, rect)
         pygame.display.flip()
