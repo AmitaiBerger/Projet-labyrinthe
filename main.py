@@ -4,6 +4,7 @@ import global_data
 import Affichage
 import sys 
 import pygame
+pygame.init()
 import Joueur
 
 def partie(taille_laby=(10,10),
@@ -66,11 +67,10 @@ if __name__=="__main__":
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+            #On detecte si on clique sur la souris, ce qui ferme le menu et lance la partie 
             if event.type == pygame.MOUSEBUTTONUP:
                 if rect.collidepoint(pygame.mouse.get_pos()):
-                    print("click")
-                    # FERMER LA FENETRE DU MENU ET LANCER LA PARTIe
-                    #fenetre.close()
+                    pygame.quit()
                     # Demande à  l'utilisateur d'entrer la taille du labyrinthe
                     print("Choisissez une longueur de labyrinthe")
                     longueur=""

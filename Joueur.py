@@ -32,13 +32,13 @@ class Joueur:
             # 2. Changement de direction (seulement si une touche est ENFONCÉE)
             if event.type == pygame.KEYDOWN:
                 match event.key:
-                    case K_RIGHT:
+                    case pygame.K_RIGHT:
                         self._direction = 0
-                    case K_UP:
+                    case pygame.K_UP:
                         self._direction = 1
-                    case K_LEFT:
+                    case pygame.K_LEFT:
                         self._direction = 2
-                    case K_DOWN:
+                    case pygame.K_DOWN:
                         self._direction = 3
                     # Si une autre touche est pressée, on ne fait rien, 
                     # on garde l'ancienne direction.
