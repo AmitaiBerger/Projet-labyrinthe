@@ -32,13 +32,13 @@ class Joueur:
             if event.type == pygame.KEYDOWN:
                 match event.key:
                     case K_RIGHT:
-                        self._direction = EST
+                        self._direction = 0
                     case K_UP:
-                        self._direction = NORD
+                        self._direction = 1
                     case K_LEFT:
-                        self._direction = OUEST
+                        self._direction = 2
                     case K_DOWN:
-                        self._direction = SUD
+                        self._direction = 3
                     # Si une autre touche est pressée, on ne fait rien, 
                     # on garde l'ancienne direction.
 
