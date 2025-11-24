@@ -119,7 +119,10 @@ if __name__=="__main__":
                                     if largeur != "":
                                         valeur = int(largeur)  # conversion
                     
-                    partie((largeur,longueur))
+                    if largeur!="" and longueur!="":
+                        partie((largeur,longueur))
+                    else:
+                        partie()
 
                     
         pygame.draw.rect(fenetre, (255, 255,255), rect)
