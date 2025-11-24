@@ -7,7 +7,8 @@ import pygame
 import Joueur
 
 def partie(taille_laby=(10,10),
-        coul_fond=(255,255,255), coul_bouton_clair=(170,170,170),police_nationale=pygame.font.SysFont('Corbel',35)):
+        coul_fond=(255,255,255), coul_bouton_clair=(170,170,170),police_nationale=pygame.font.SysFont('Corbel',35),
+        touches = [pygame.K_z, pygame.K_q, pygame.K_s, pygame.K_d]):
     """ boucle principale du jeu. Prend en argument les paramètre graphiques du style"""
     print("lancement d'une partie'")
     # menu principal
@@ -24,12 +25,34 @@ def partie(taille_laby=(10,10),
     # création du Joueur :
     J1 = Joueur(Labyr,Labyr.cases[0],(255,0,0),4,5)
 
-    # 
+    # affichage initial
+    #vision_init = Labyr.visibles()
+
 
     # boucle principale :
     Sortie = False
-    #while not Sortie:
-    #    pass
+
+    while not Sortie:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                # FERME LA FENTRE ET REOUVRE LE MENU
+                pygame.quit()
+                sys.exit()
+            #if event.type == pygame.MOUSEBUTTONUP:
+                #if rect.collidepoint(pygame.mouse.get_pos()):
+
+            if event.type == pygame.KEYDOWN:
+                if event.key in touches:
+                    J1.tourner_suivant_key_ou_deplacer(event.key)
+                    J1.visu_actuel = Labyr.visibles(J1.labyrinthe,J1._case.i)
+                    J1.cases_vues = J1.cases_vues.union(J1.visu_actuel)
+
+                    
+        # dessin éléments :
+        # TODO
+                    
+        pygame.display.flip()
+        Horloge.tick(60)
 
 
 

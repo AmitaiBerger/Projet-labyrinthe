@@ -17,3 +17,7 @@ class Fenetre:
         fen.but1.pack()
 
         root.mainloop()
+
+def affiche_labyrinthe():
+    #utilise pygame pour afficher le labyrinthe
+    pass
