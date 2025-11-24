@@ -4,9 +4,33 @@ import global_data
 import Affichage
 import sys 
 import pygame
+import Joueur
 
-def partie():
+def partie(taille_laby=(10,10),
+        coul_fond=(255,255,255), coul_bouton_clair=(170,170,170),police_nationale=pygame.font.SysFont('Corbel',35)):
+    """ boucle principale du jeu. Prend en argument les paramètre graphiques du style"""
     print("lancement d'une partie'")
+    # menu principal
+    pygame.init() 
+    res = (720,720) 
+    fenetre = pygame.display.set_mode(res)
+    largeur = fenetre.get_width()  
+    hauteur = fenetre.get_height() 
+    Horloge = pygame.time.Clock()
+
+    Labyr = Labyrinthe(10,10)
+    Labyr.generer_par_Wilson()
+
+    # création du Joueur :
+    J1 = Joueur(Labyr,Labyr.cases[0],(255,0,0),4,5)
+
+    # 
+
+    # boucle principale :
+    Sortie = False
+    #while not Sortie:
+    #    pass
+
 
 
 if __name__=="__main__":
@@ -46,6 +70,11 @@ if __name__=="__main__":
                 if rect.collidepoint(pygame.mouse.get_pos()):
                     #fenetre()
                     print("click")
+                    # FERMER LA FENETRE DU MENU ET LANCER LA PARTIe
+                    #fenetre.close()
+                    partie()
+
+                    
         pygame.draw.rect(fenetre, (255, 255,255), rect)
         fenetre.blit(click, rect)
         pygame.display.flip()

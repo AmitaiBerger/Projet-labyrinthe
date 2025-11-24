@@ -16,6 +16,7 @@ class Joueur:
         self._direction = direction # Doit être initialisé à une direction valide
         self._running = True
         self.speed = speed
+        self.labyrinthe = labyrinthe
         
     def changement_direction(self) -> None:
         """

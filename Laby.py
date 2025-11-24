@@ -141,28 +141,28 @@ class Labyrinthe():
         cases_dans_laby = set()
         premiere = random.randrange(self.largeur * self.hauteur)
         cases_dans_laby.add(premiere)
-        print("premiere case du Labyrinthe :", premiere)
+        #print("premiere case du Labyrinthe :", premiere)
         cases_non_generees = set(range(self.largeur * self.hauteur)) - cases_dans_laby
         while(cases_non_generees):
-            print("génération d'une branche")
+            #print("génération d'une branche")
             # génération de la premiere case de la branche
             caseActu = random.choice(list(cases_non_generees))
             
-            print("à partir de :",caseActu)
+            #print("à partir de :",caseActu)
             cheminActu = [caseActu]
             while caseActu not in cases_dans_laby:
                 voisins = self.indices_voisins(caseActu)
                 prochain = random.choice(voisins)
-                print("prochain :",prochain)
+                #print("prochain :",prochain)
                 if(prochain in cheminActu):# si on fait une boucle, on supprime
-                    print("boucle")
+                    #print("boucle")
                     cheminActu = cheminActu[:cheminActu.index(prochain)+1]
                 else:
                     cheminActu.append(prochain)
                 caseActu = prochain
 
             # on a trouvé un chemin qui rejoint le labyrinthe
-            print("chemin trouvé :",cheminActu)
+            #print("chemin trouvé :",cheminActu)
 
             # On ajoute le chemin au labyrinthe
             for i in range(len(cheminActu)-1):
