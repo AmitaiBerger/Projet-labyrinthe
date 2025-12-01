@@ -28,6 +28,8 @@ def partie(taille_laby=(10,10),
 
     # création du Joueur :
     J1 = Joueur.Joueur(Labyr,Labyr.cases[0],(255,0,0),4,5)
+    J1.visu_actuel = Labyr.cases[J1.get_case_absolue()].visibles
+    J1.cases_vues = J1.cases_vues.union(J1.visu_actuel)
 
     # affichage initial
     #vision_init = Labyr.visibles()

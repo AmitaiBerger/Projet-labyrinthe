@@ -37,10 +37,10 @@ def dessine_case_absolue(case,x_centre,y_centre,taille_case,fond,coul_mur=(0,0,0
             #print("taille_case=",taille_case)
         if not case.voisins[i]:
             pygame.draw.line(fond,coul_mur,
-                             [x_centre+math.cos((-i/4-1/8)*2*math.pi)*taille_case/2,
-                              y_centre+math.sin((-i/4-1/8)*2*math.pi)*taille_case/2],
-                             [x_centre+math.cos((-i/4+1/8)*2*math.pi)*taille_case/2,
-                              y_centre+math.sin((-i/4+1/8)*2*math.pi)*taille_case/2],3)
+                             [x_centre+math.cos((-i/4-1/8)*2*math.pi)*taille_case*math.sqrt(2)/2,
+                              y_centre+math.sin((-i/4-1/8)*2*math.pi)*taille_case*math.sqrt(2)/2],
+                             [x_centre+math.cos((-i/4+1/8)*2*math.pi)*taille_case*math.sqrt(2)/2,
+                              y_centre+math.sin((-i/4+1/8)*2*math.pi)*taille_case*math.sqrt(2)/2],3)
     police_nationale = pygame.font.SysFont('Corbel',5) 
     text = police_nationale.render(str(case.i) , True , (0,0,0))
 
@@ -51,12 +51,15 @@ def affiche_joueur(fond,joueur,taille_laby):
     y_centre_case = (joueur.get_case_absolue() // joueur.labyrinthe.largeur + 0.5) * taille_case
     pygame.draw.circle(fond,joueur._color,(x_centre_case,y_centre_case),taille_case/4)
 
-def affiche_ensemble_de_cases(fond,labyrinthe,ensemble_cases,taille_laby,coul_mur=(0,0,0)):
+def affiche_ensemble_de_cases(fond,labyrinthe,ensemble_cases,taille_laby,coul_mur=(0,0,0),directionnel=False):
     #utilise pygame pour afficher un ensemble de cases
     # ensemble_cases est un ensemble d'indices de cases
-    for indice in ensemble_cases:
-        case = labyrinthe.cases[indice]
-        taille_case = taille_laby/labyrinthe.largeur
-        x_centre_case = (case.i % labyrinthe.largeur + 0.5) * taille_case
-        y_centre_case = (case.i // labyrinthe.largeur + 0.5) * taille_case
-        dessine_case_absolue(case,x_centre_case,y_centre_case,taille_case,fond,coul_mur)
+    if not directionnel:
+        for indice in ensemble_cases:
+            case = labyrinthe.cases[indice]
+            taille_case = taille_laby/labyrinthe.largeur
+            x_centre_case = (case.i % labyrinthe.largeur + 0.5) * taille_case
+            y_centre_case = (case.i // labyrinthe.largeur + 0.5) * taille_case
+            dessine_case_absolue(case,x_centre_case,y_centre_case,taille_case,fond,coul_mur)
+    else:
+        pass # TODO
