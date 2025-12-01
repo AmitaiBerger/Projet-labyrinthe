@@ -32,7 +32,7 @@ def dessine_case_absolue(case,x_centre,y_centre,taille_case,fond,coul_mur=(0,0,0
     for i in range(len(case.voisins)):
         # affiche une ligne orthogonale entre les deux cases s'ils ne sont pas voisins
         # rien sinon
-        if(case.i==10):
+        #if(case.i==10):
             #print("debug case 10. x_centre=",x_centre," y_centre=",y_centre)
             #print("taille_case=",taille_case)
         if case.voisins[i]:
