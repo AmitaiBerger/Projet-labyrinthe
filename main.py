@@ -18,6 +18,7 @@ def partie(taille_laby=(10,10),
     fenetre = pygame.display.set_mode(res)
     largeur = fenetre.get_width()  
     hauteur = fenetre.get_height() 
+    fenetre.fill((255, 255, 255))
     Horloge = pygame.time.Clock()
 
     Labyr = Labyrinthe(10,10)
@@ -34,7 +35,7 @@ def partie(taille_laby=(10,10),
     Sortie = False
 
     while not Sortie:
-        if(pygame.time.get_ticks>1000):
+        if(pygame.time.get_ticks()>10000):
             Sortie = True
             print("sortie car temps trop long")
         for event in pygame.event.get():
@@ -59,10 +60,10 @@ def partie(taille_laby=(10,10),
         Affichage.affiche_labyrinthe(fenetre,Labyr,min(largeur,hauteur),coul_mur=(0,0,255))
 
         # dessin des cases déjà vues (en GRIS)
-        Affichage.affiche_ensemble_de_cases(fenetre,Labyr,J1.cases_vues,min(largeur,hauteur),coul_case=(150,150,150))
+        Affichage.affiche_ensemble_de_cases(fenetre,Labyr,J1.cases_vues,min(largeur,hauteur),coul_mur=(150,150,150))
 
         # dessin des cases vues actuellement (en NOIR)
-        Affichage.affiche_ensemble_de_cases(fenetre,Labyr,J1.visu_actuel,min(largeur,hauteur),coul_case=(0,0,0))
+        Affichage.affiche_ensemble_de_cases(fenetre,Labyr,J1.visu_actuel,min(largeur,hauteur),coul_mur=(0,0,0))
 
 
         # dessin du joueur en position absolue (en la couleur du joueur)
