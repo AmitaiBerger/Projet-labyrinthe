@@ -35,12 +35,12 @@ def dessine_case_absolue(case,x_centre,y_centre,taille_case,fond,coul_mur=(0,0,0
         #if(case.i==10):
             #print("debug case 10. x_centre=",x_centre," y_centre=",y_centre)
             #print("taille_case=",taille_case)
-        if case.voisins[i]:
+        if not case.voisins[i]:
             pygame.draw.line(fond,coul_mur,
-                             [x_centre+math.cos((i/4+1/8)*2*math.pi)*taille_case/2,
-                              y_centre+math.sin((i/4+1/8)*2*math.pi)*taille_case/2],
-                             [x_centre+math.cos((i/4-1/8)*2*math.pi)*taille_case/2,
-                              y_centre+math.sin((i/4-1/8)*2*math.pi)*taille_case/2],3)
+                             [x_centre+math.cos((-i/4-1/8)*2*math.pi)*taille_case/2,
+                              y_centre+math.sin((-i/4-1/8)*2*math.pi)*taille_case/2],
+                             [x_centre+math.cos((-i/4+1/8)*2*math.pi)*taille_case/2,
+                              y_centre+math.sin((-i/4+1/8)*2*math.pi)*taille_case/2],3)
     police_nationale = pygame.font.SysFont('Corbel',5) 
     text = police_nationale.render(str(case.i) , True , (0,0,0))
 
