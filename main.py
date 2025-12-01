@@ -31,13 +31,17 @@ def partie(taille_laby=(10,10),
 
     # affichage initial
     #vision_init = Labyr.visibles()
+    fenetre.fill((255, 255,255))
+    pygame.display.update()
 
 
     # boucle principale :
     Sortie = False
 
+    print("lancement de la boucle principale")
+
     while not Sortie:
-        if(pygame.time.get_ticks()>10000):
+        if(pygame.time.get_ticks()>100000):
             Sortie = True
             print("sortie car temps trop long")
         for event in pygame.event.get():
@@ -59,19 +63,20 @@ def partie(taille_laby=(10,10),
         
         # dessin du labyrinthe total pour débuggage (en BLEU)
         # pour l'instant, l'affichage se fait en position absolue
-        Affichage.affiche_labyrinthe(fenetre,Labyr,min(largeur,hauteur),coul_mur=(0,0,255))
+        Affichage.affiche_labyrinthe(fenetre,Labyr,min(res[0],res[1]),coul_mur=(0,0,255))
 
         # dessin des cases déjà vues (en GRIS)
-        Affichage.affiche_ensemble_de_cases(fenetre,Labyr,J1.cases_vues,min(largeur,hauteur),coul_mur=(150,150,150))
+        Affichage.affiche_ensemble_de_cases(fenetre,Labyr,J1.cases_vues,min(res[0],res[1]),coul_mur=(150,150,150))
 
         # dessin des cases vues actuellement (en NOIR)
-        Affichage.affiche_ensemble_de_cases(fenetre,Labyr,J1.visu_actuel,min(largeur,hauteur),coul_mur=(0,0,0))
+        Affichage.affiche_ensemble_de_cases(fenetre,Labyr,J1.visu_actuel,min(res[0],res[1]),coul_mur=(0,0,0))
 
 
         # dessin du joueur en position absolue (en la couleur du joueur)
-        Affichage.affiche_joueur(fenetre,J1,min(largeur,hauteur))
+        Affichage.affiche_joueur(fenetre,J1,min(res[0],res[1]))
                     
-        pygame.display.flip()
+        #pygame.display.flip()
+        pygame.display.update()
         Horloge.tick(60)
 
 
