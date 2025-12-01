@@ -16,24 +16,34 @@ def partie(taille_laby=(10,10),
     pygame.init() 
     res = (720,720) 
     fenetre = pygame.display.set_mode(res)
-    largeur = fenetre.get_width()  
-    hauteur = fenetre.get_height() 
+    pygame.display.set_caption("Jeu de labyrinthe")
+    largeur = taille_laby[1]
+    longueur = taille_laby[0]
     Horloge = pygame.time.Clock()
 
-    Labyr = Labyrinthe(10,10)
+    Labyr = Labyrinthe(largeur,longueur)
     Labyr.generer_par_Wilson()
+    Labyr.afficher_comme_texte()
+    Labyr.visibles()
 
     # création du Joueur :
     J1 = Joueur.Joueur(Labyr,Labyr.cases[0],(255,0,0),4,5)
 
     # affichage initial
     #vision_init = Labyr.visibles()
+    fenetre.fill((255, 255,255))
+    pygame.display.update()
 
 
     # boucle principale :
     Sortie = False
 
+    print("lancement de la boucle principale")
+
     while not Sortie:
+        if(pygame.time.get_ticks()>100000):
+            Sortie = True
+            print("sortie car temps trop long")
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 # FERME LA FENTRE ET REOUVRE LE MENU
@@ -50,9 +60,23 @@ def partie(taille_laby=(10,10),
 
                     
         # dessin éléments :
-        # TODO
+        
+        # dessin du labyrinthe total pour débuggage (en BLEU)
+        # pour l'instant, l'affichage se fait en position absolue
+        Affichage.affiche_labyrinthe(fenetre,Labyr,min(res[0],res[1]),coul_mur=(0,0,255))
+
+        # dessin des cases déjà vues (en GRIS)
+        Affichage.affiche_ensemble_de_cases(fenetre,Labyr,J1.cases_vues,min(res[0],res[1]),coul_mur=(150,150,150))
+
+        # dessin des cases vues actuellement (en NOIR)
+        Affichage.affiche_ensemble_de_cases(fenetre,Labyr,J1.visu_actuel,min(res[0],res[1]),coul_mur=(0,0,0))
+
+
+        # dessin du joueur en position absolue (en la couleur du joueur)
+        Affichage.affiche_joueur(fenetre,J1,min(res[0],res[1]))
                     
-        pygame.display.flip()
+        #pygame.display.flip()
+        pygame.display.update()
         Horloge.tick(60)
 
 
@@ -98,58 +122,80 @@ if __name__=="__main__":
             #On detecte si on clique sur la souris, ce qui ferme le menu et lance la partie 
             if event.type == pygame.MOUSEBUTTONUP:
                 if rect.collidepoint(pygame.mouse.get_pos()):
-                    #pygame.quit()
-                    # Demande à  l'utilisateur d'entrer la taille du labyrinthe
-                    print("Choisissez une longueur de labyrinthe")
-                    longueur=""
-                    running = True
-                    while running:
-                        for event in pygame.event.get():
-                            if event.type == pygame.QUIT:
-                                running = False
-
-                            if event.type == pygame.KEYDOWN:
-
-                                # L'utilisateur tape un chiffre (0-9)
-                                if event.unicode.isdigit():
-                                    longueur += event.unicode
-
-                                # Effacer un chiffre (BACKSPACE)
-                                if event.key == pygame.K_BACKSPACE:
-                                    longueur = longueur[:-1]
-
-                                # Valider avec ENTER
-                                if event.key == pygame.K_RETURN:
-                                    if longueur != "":
-                                        valeur = int(longueur)  # conversion
-                                
-                    print("Choisissez une largeur de labyrinthe")
-
-                    largeur=""
-                    running2 = True
-                    while running2:
-                        for event in pygame.event.get():
-                            if event.type == pygame.QUIT:
-                                running2 = False
-
-                            if event.type == pygame.KEYDOWN:
-
-                                # L'utilisateur tape un chiffre (0-9)
-                                if event.unicode.isdigit():
-                                    largeur += event.unicode
-
-                                # Effacer un chiffre (BACKSPACE)
-                                if event.key == pygame.K_BACKSPACE:
-                                    largeur = largeur[:-1]
-
-                                # Valider avec ENTER
-                                if event.key == pygame.K_RETURN:
-                                    if largeur != "":
-                                        valeur = int(largeur)  # conversion
-                                    running2=False
-
+                    pygame.display.quit()
                     
+                    #On ouvre une fenetre qui demande à  l'utilisateur d'entrer la taille du labyrinthe
+                    fen1 = pygame.display.set_mode((500, 200))
+                    pygame.display.set_caption("Choisissez une longueur de labyrinthe")
+
+                    # --- Variables ---
+                    longueur = ""      # Ce que l'utilisateur tape
+                    active = True        # Tant que la saisie est ouverte
+                    clock = pygame.time.Clock()
+
+                    while active:
+                        for event in pygame.event.get():
+                            if event.type == pygame.QUIT:
+                                active = False
+
+                            if event.type == pygame.KEYDOWN:
+                                if event.key == pygame.K_RETURN:
+                                    print("Nombre entré :", longueur)
+                                    active = False  # fermer la fenêtre ou continuer
+                                elif event.key == pygame.K_BACKSPACE:
+                                    longueur = longueur[:-1]
+                                else:
+                                    # Ajouter seulement des chiffres
+                                    if event.unicode.isdigit():
+                                        longueur += event.unicode
+
+                        # --- Affichage ---
+                        fen1.fill((30, 30, 30))  # gris foncé
+
+                        txt_surface = police_nationale.render("Choisissez une longueur : " + longueur, True, (255, 255, 255))
+                        fen1.blit(txt_surface, (20, 80))
+
+                        pygame.display.update()
+                        clock.tick(30)
+
+                    pygame.display.quit()
+                    fen2 = pygame.display.set_mode((500, 200))   
+                    pygame.display.set_caption("Choisissez une largeur de labyrinthe")
+                    # --- Variables ---
+                    largeur = ""      # Ce que l'utilisateur tape
+                    active = True        # Tant que la saisie est ouverte
+                    clock = pygame.time.Clock()
+
+                    while active:
+                        for event in pygame.event.get():
+                            if event.type == pygame.QUIT:
+                                active = False
+
+                            if event.type == pygame.KEYDOWN:
+                                if event.key == pygame.K_RETURN:
+                                    print("Nombre entré :", largeur)
+                                    active = False  # fermer la fenêtre ou continuer
+                                elif event.key == pygame.K_BACKSPACE:
+                                    largeur = largeur[:-1]
+                                else:
+                                    # Ajouter seulement des chiffres
+                                    if event.unicode.isdigit():
+                                        largeur += event.unicode
+
+                        # --- Affichage ---
+                        fen2.fill((30, 30, 30))  # gris foncé
+
+                        txt_surface = police_nationale.render("Choisissez une largeur: " + largeur, True, (255, 255, 255))
+                        fen2.blit(txt_surface, (20, 80))
+
+                        pygame.display.update()
+                        clock.tick(30)
+
+
+                    pygame.display.quit()
                     if largeur!="" and longueur!="":
+                        largeur=int(largeur)
+                        longueur=int(longueur)
                         partie((largeur,longueur))
                     else:
                         partie()
