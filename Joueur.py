@@ -11,7 +11,7 @@ class Joueur:
     et un running pour signaler s'il faut stopper le jeu
     """
     def __init__(self,labyrinthe,case,color,direction,speed):
-        self._case = case
+        self._case = case # Case actuelle. Attribut privé car son indice sera inconnue par le joueur durant la partie
         self._color = color
         self._direction = direction # Doit être initialisé à une direction valide
         self._running = True
@@ -37,6 +37,9 @@ class Joueur:
                 self.tourner_suivant_key(event.key)
                 
 
+    def get_case_absolue(self):
+        return self._case.i
+
     def tourner_suivant_key_ou_deplacer(self,key) -> None:
         for i in range(4):
             if(self.touches_direction[i] == key):
@@ -55,7 +58,7 @@ class Joueur:
         """
         if self.direction == 4:# non oriente
             return None
-        if self.case.voisins[self.direction]:# 
+        if self.case.voisins[self.direction]:# si on peut passer
             match self.direction:
                 case 0:
                     self._case = self.labyrinthe.cases[self._case.i+1]
