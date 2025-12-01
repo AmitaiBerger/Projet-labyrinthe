@@ -60,6 +60,11 @@ def partie(taille_laby=(10,10),
 if __name__=="__main__":
     Labyr = Labyrinthe(10,10)
     Labyr.generer_par_Wilson()
+    #Labyr.creuser_trous()
+    Labyr.creuser_trous_intelligents(longueur_max_probabilite=5)
+    #Labyr.placer_depart(ratio_distance_min=0.7)
+    Labyr.placer_deux_joueurs(ratio_eloignement=0.6)
+    #Labyr.creuser_trous_organiques(seuil_min=6, longueur_ref=20)
     print("coordonnées 5,5 :", Labyr.cases[5*Labyr.largeur+5].voisins)
     Labyr.afficher_comme_texte()
     Labyr.visibles()
