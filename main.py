@@ -121,11 +121,11 @@ if __name__=="__main__":
                     print("Choisissez une largeur de labyrinthe")
 
                     largeur=""
-                    running = True
-                    while running:
+                    running2 = True
+                    while running2:
                         for event in pygame.event.get():
                             if event.type == pygame.QUIT:
-                                running = False
+                                running2 = False
 
                             if event.type == pygame.KEYDOWN:
 
@@ -141,6 +141,8 @@ if __name__=="__main__":
                                 if event.key == pygame.K_RETURN:
                                     if largeur != "":
                                         valeur = int(largeur)  # conversion
+                                    running2=False
+
                     
                     if largeur!="" and longueur!="":
                         partie((largeur,longueur))
