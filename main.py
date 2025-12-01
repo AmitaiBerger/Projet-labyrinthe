@@ -24,7 +24,7 @@ def partie(taille_laby=(10,10),
     Labyr.generer_par_Wilson()
 
     # création du Joueur :
-    J1 = Joueur(Labyr,Labyr.cases[0],(255,0,0),4,5)
+    J1 = Joueur.Joueur(Labyr,Labyr.cases[0],(255,0,0),4,5)
 
     # affichage initial
     #vision_init = Labyr.visibles()
@@ -93,7 +93,7 @@ if __name__=="__main__":
             #On detecte si on clique sur la souris, ce qui ferme le menu et lance la partie 
             if event.type == pygame.MOUSEBUTTONUP:
                 if rect.collidepoint(pygame.mouse.get_pos()):
-                    pygame.quit()
+                    #pygame.quit()
                     # Demande à  l'utilisateur d'entrer la taille du labyrinthe
                     print("Choisissez une longueur de labyrinthe")
                     longueur=""

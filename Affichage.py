@@ -18,6 +18,12 @@ class Fenetre:
 
         root.mainloop()
 
-def affiche_labyrinthe():
+def affiche_labyrinthe(fond,labyrinthe,taille_laby,coul_mur=(0,0,0)):
     #utilise pygame pour afficher le labyrinthe
-    pass
+    for case in labyrinthe.cases:
+        for voisin in case.voisins:
+            # affiche une ligne orthogonale entre les deux cases s'ils ne sont pas voisins
+            # rien sinon
+            taille_case = taille_laby/labyrinthe.cases
+            pygame.draw.line(fond,coul_mur,taille_laby/labyrinthe.largeur)
+            pass
