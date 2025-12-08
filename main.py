@@ -200,7 +200,7 @@ if __name__=="__main__":
                     else:
                         partie()
 
-        image = pygame.image.load("C:\\Users\\amita\\OneDrive\\Documents\\Labyritnhe\\Labyrinthe-Artmazia-76--aurelienpapa-05.jpg")
+        image = pygame.image.load("Projet-labyrinthe/Labyrinthe-Artmazia-76--aurelienpapa-05.jpg")
 
         image = pygame.transform.scale(image, (200, 150))
         pygame.draw.rect(fenetre, (255, 255,255), rect)
