@@ -61,12 +61,18 @@ class Joueur:
         if self.case.voisins[self.direction]:# si on peut passer
             match self.direction:
                 case 0:
-                    self._case = self.labyrinthe.cases[self._case.i+1]
+                    self._case = self.labyrinthe.cases[self._case.i+1].i
                 case 1:
-                    self._case = self.labyrinthe.cases[self._case.i-self.labyrinthe.largeur]
+                    self._case = self.labyrinthe.cases[self._case.i-self.labyrinthe.largeur].i
                 case 2:
-                    self._case = self.labyrinthe.cases[self._case.i-1]
+                    self._case = self.labyrinthe.cases[self._case.i-1].i
                 case 3:
-                    self._case = self.labyrinthe.cases[self._case.i+self.labyrinthe.largeur]
+                    self._case = self.labyrinthe.cases[self._case.i+self.labyrinthe.largeur].i
 
                     
+    def voir(self):
+        """Maj le visu_actuel et les cases_vues"""
+        self.visu_actuel = set()
+        for direction in ["haut","bas","gauche","droite"]:
+            self.visu_actuel = self.visu_actuel.union(self.labyrinthe.cases[self.get_case_absolue()].visibles[direction])             
+            self.cases_vues = self.cases_vues.union(self.visu_actuel)

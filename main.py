@@ -28,8 +28,7 @@ def partie(taille_laby=(10,10),
 
     # création du Joueur :
     J1 = Joueur.Joueur(Labyr,Labyr.cases[0],(255,0,0),4,5)
-    J1.visu_actuel = Labyr.cases[J1.get_case_absolue()].visibles
-    J1.cases_vues = J1.cases_vues.union(J1.visu_actuel)
+    J1.voir()
 
     # affichage initial
     #vision_init = Labyr.visibles()
@@ -57,8 +56,7 @@ def partie(taille_laby=(10,10),
             if event.type == pygame.KEYDOWN:
                 if event.key in touches:
                     J1.tourner_suivant_key_ou_deplacer(event.key)
-                    J1.visu_actuel = Labyr.visibles(J1.labyrinthe,J1._case.i)
-                    J1.cases_vues = J1.cases_vues.union(J1.visu_actuel)
+                    J1.voir()
 
                     
         # dessin éléments :
