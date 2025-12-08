@@ -28,16 +28,22 @@ def partie(taille_laby=(10,10),
 
     # création du Joueur :
     J1 = Joueur.Joueur(Labyr,Labyr.cases[0],(255,0,0),4,5)
+    J1.visu_actuel = Labyr.cases[J1.get_case_absolue()].visibles
+    J1.cases_vues = J1.cases_vues.union(J1.visu_actuel)
 
     # affichage initial
     #vision_init = Labyr.visibles()
+    fenetre.fill((255, 255,255))
+    pygame.display.update()
 
 
     # boucle principale :
     Sortie = False
 
+    print("lancement de la boucle principale")
+
     while not Sortie:
-        if(pygame.time.get_ticks>1000):
+        if(pygame.time.get_ticks()>100000):
             Sortie = True
             print("sortie car temps trop long")
         for event in pygame.event.get():
@@ -59,24 +65,37 @@ def partie(taille_laby=(10,10),
         
         # dessin du labyrinthe total pour débuggage (en BLEU)
         # pour l'instant, l'affichage se fait en position absolue
-        Affichage.affiche_labyrinthe(fenetre,Labyr,min(largeur,hauteur),coul_mur=(0,0,255))
+        Affichage.affiche_labyrinthe(fenetre,Labyr,min(res[0],res[1]),coul_mur=(0,0,255))
 
         # dessin des cases déjà vues (en GRIS)
-        Affichage.affiche_ensemble_de_cases(fenetre,Labyr,J1.cases_vues,min(largeur,hauteur),coul_case=(150,150,150))
+        Affichage.affiche_ensemble_de_cases(fenetre,Labyr,J1.cases_vues,min(res[0],res[1]),coul_mur=(150,150,150))
 
         # dessin des cases vues actuellement (en NOIR)
-        Affichage.affiche_ensemble_de_cases(fenetre,Labyr,J1.visu_actuel,min(largeur,hauteur),coul_case=(0,0,0))
+        Affichage.affiche_ensemble_de_cases(fenetre,Labyr,J1.visu_actuel,min(res[0],res[1]),coul_mur=(0,0,0))
 
 
         # dessin du joueur en position absolue (en la couleur du joueur)
-        Affichage.affiche_joueur(fenetre,J1,min(largeur,hauteur))
+        Affichage.affiche_joueur(fenetre,J1,min(res[0],res[1]))
                     
-        pygame.display.flip()
+        #pygame.display.flip()
+        pygame.display.update()
         Horloge.tick(60)
 
 
 
 if __name__=="__main__":
+    Labyr = Labyrinthe(10,10)
+    Labyr.generer_par_Wilson()
+    #Labyr.creuser_trous()
+    Labyr.creuser_trous_intelligents(longueur_max_probabilite=5)
+    #Labyr.placer_depart(ratio_distance_min=0.7)
+    Labyr.placer_deux_joueurs(ratio_eloignement=0.6)
+    #Labyr.creuser_trous_organiques(seuil_min=6, longueur_ref=20)
+    print("coordonnées 5,5 :", Labyr.cases[5*Labyr.largeur+5].voisins)
+    Labyr.afficher_comme_texte()
+    Labyr.visibles()
+    print("vision  depuis la case 5,5 :", Labyr.cases[5*Labyr.largeur+5].visibles)
+    print("vision  depuis la case 4,4 :", Labyr.cases[4*Labyr.largeur+4].visibles)
 
     # menu principal
     pygame.init() 
