@@ -49,9 +49,12 @@ def partie(taille_laby=(10,10),
             if event.type == pygame.QUIT:
                 Sortie = True
             if event.type == pygame.KEYDOWN:
+                #on efface la position précédente du joueur et on dessine la nouvelle position
+                Affichage.effacer_joueur(fenetre,J1,min(res[0],res[1]))
                 J1.changement_direction(event.key)
                 J1.deplacement()
                 J1.voir()
+
 
                     
         # dessin éléments :
@@ -68,7 +71,7 @@ def partie(taille_laby=(10,10),
 
 
         # dessin du joueur en position absolue (en la couleur du joueur)
-        Affichage.affiche_joueur(fenetre,J1,min(res[0],res[1]))
+        Affichage.afficher_joueur(fenetre,J1,min(res[0],res[1]))
                     
         #pygame.display.flip()
         pygame.display.update()
@@ -115,8 +118,8 @@ if __name__=="__main__":
                 pygame.quit()
                 sys.exit()
             #On detecte si on clique sur la souris, ce qui ferme le menu et lance la partie 
-            if event.type == pygame.MOUSEBUTTONUP:
-                if rect.collidepoint(pygame.mouse.get_pos()):
+            if event.type == pygame.MOUSEBUTTONUP or event.type==pygame.KEYDOWN:
+                if rect.collidepoint(pygame.mouse.get_pos()) or event.key == pygame.K_RETURN:
                     pygame.display.quit()
                     
                     #On ouvre une fenetre qui demande à  l'utilisateur d'entrer la taille du labyrinthe
@@ -195,11 +198,10 @@ if __name__=="__main__":
                     else:
                         partie()
 
-        image = pygame.image.load("Projet-labyrinthe/loading_image.png")
+        image = pygame.image.load("C:\\Users\\amita\\Nouveau-dossier\\Projet-labyrinthe\\loading_image.png")
         image = pygame.transform.scale(image, res)
         pygame.draw.rect(fenetre, (255, 255,255), rect)
-        fenetre.blit(image, (0, 0))       # position x=50, y=50*
-        
+        fenetre.blit(image, (0, 0))      
         fenetre.blit(click, rect)
         pygame.display.flip()
         Horloge.tick(60)
