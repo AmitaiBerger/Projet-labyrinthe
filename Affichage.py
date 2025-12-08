@@ -44,12 +44,18 @@ def dessine_case_absolue(case,x_centre,y_centre,taille_case,fond,coul_mur=(0,0,0
     police_nationale = pygame.font.SysFont('Corbel',5) 
     text = police_nationale.render(str(case.i) , True , (0,0,0))
 
-def affiche_joueur(fond,joueur,taille_laby):
+def afficher_joueur(fond,joueur,taille_laby):
     #utilise pygame pour afficher le joueur
     taille_case = taille_laby/joueur.labyrinthe.largeur
     x_centre_case = (joueur.get_case_absolue() % joueur.labyrinthe.largeur + 0.5) * taille_case
     y_centre_case = (joueur.get_case_absolue() // joueur.labyrinthe.largeur + 0.5) * taille_case
     pygame.draw.circle(fond,joueur._color,(x_centre_case,y_centre_case),taille_case/4)
+
+def effacer_joueur(fond,joueur,taille_laby):
+    taille_case = taille_laby/joueur.labyrinthe.largeur
+    x_centre_case = (joueur.get_case_absolue() % joueur.labyrinthe.largeur + 0.5) * taille_case
+    y_centre_case = (joueur.get_case_absolue() // joueur.labyrinthe.largeur + 0.5) * taille_case
+    pygame.draw.circle(fond,(255, 255, 255),(x_centre_case,y_centre_case),taille_case/4)
 
 def affiche_ensemble_de_cases(fond,labyrinthe,ensemble_cases,taille_laby,coul_mur=(0,0,0),directionnel=False):
     #utilise pygame pour afficher un ensemble de cases

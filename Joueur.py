@@ -1,5 +1,4 @@
 import pygame
-from pygame.locals import K_RIGHT, K_UP, K_LEFT, K_DOWN
 
 from global_data import *
 
@@ -26,13 +25,13 @@ class Joueur:
         La direction est conservée même si la touche est relâchée.
         """
         if key == pygame.K_RIGHT:
-            self.direction=K_RIGHT
+            self.direction=0
         if key == pygame.K_UP:
-            self.direction=K_UP
+            self.direction=1
         if key == pygame.K_LEFT:
-            self.direction =K_LEFT
+            self.direction =2
         if key == pygame.K_DOWN:
-            self.direction=K_DOWN
+            self.direction=3
 
                 
 
@@ -47,8 +46,8 @@ class Joueur:
         on change la case sur laquelle il est selon la direction qu'il prend
         en vérifiant d'abord si cette case est accessible
         """
-        if self.direction == 4:# non oriente
-            pass
+        if self._direction == 4:# non oriente
+            return
         if self._case.voisins[self.direction]:# si on peut passer
             match self.direction:
                 case 0:
