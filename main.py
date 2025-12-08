@@ -195,8 +195,7 @@ if __name__=="__main__":
                     else:
                         partie()
 
-        image = pygame.image.load("C:\\Users\\amita\\Nouveau-dossier\\Projet-labyrinthe\\loading_image.png")
-
+        image = pygame.image.load("Projet-labyrinthe/loading_image.png")
         image = pygame.transform.scale(image, res)
         pygame.draw.rect(fenetre, (255, 255,255), rect)
         fenetre.blit(image, (0, 0))       # position x=50, y=50*
