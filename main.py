@@ -97,7 +97,7 @@ if __name__=="__main__":
 
     # menu principal
     pygame.init() 
-    res = (720,720) 
+    res = (750,600) 
     fenetre = pygame.display.set_mode(res)
     largeur = fenetre.get_width()  
     hauteur = fenetre.get_height() 
@@ -106,7 +106,7 @@ if __name__=="__main__":
     # définition des couleurs et du style :
     coul_fond = (255,255,255) 
     coul_bouton_clair = (170,170,170)
-    rect = pygame.Rect(200,350,220,100)
+    rect = pygame.Rect(300,250,220,100)
     police_nationale = pygame.font.SysFont('Corbel',100) 
     click = police_nationale.render("Start", 1, (0,0,0))
 
@@ -202,9 +202,9 @@ if __name__=="__main__":
 
         image = pygame.image.load("C:\\Users\\amita\\Nouveau-dossier\\Projet-labyrinthe\\loading_image.png")
 
-        image = pygame.transform.scale(image, (200, 150))
+        image = pygame.transform.scale(image, res)
         pygame.draw.rect(fenetre, (255, 255,255), rect)
-        fenetre.blit(image, (50, 50))       # position x=50, y=50*
+        fenetre.blit(image, (0, 0))       # position x=50, y=50*
         
         fenetre.blit(click, rect)
         pygame.display.flip()
