@@ -47,16 +47,11 @@ def partie(taille_laby=(10,10),
             print("sortie car temps trop long")
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                # FERME LA FENTRE ET REOUVRE LE MENU
-                pygame.quit()
-                sys.exit()
-            #if event.type == pygame.MOUSEBUTTONUP:
-                #if rect.collidepoint(pygame.mouse.get_pos()):
-
+                Sortie = True
             if event.type == pygame.KEYDOWN:
-                if event.key in touches:
-                    J1.tourner_suivant_key_ou_deplacer(event.key)
-                    J1.voir()
+                J1.changement_direction(event.key)
+                J1.deplacement()
+                J1.voir()
 
                     
         # dessin éléments :

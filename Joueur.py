@@ -17,57 +17,48 @@ class Joueur:
         self._running = True
         self.speed = speed
         self.labyrinthe = labyrinthe
-        self.touches_direction = [pygame.K_z, pygame.K_q, pygame.K_s, pygame.K_d]
         self.visu_actuel = set() # ensemble des indices de cases visibles actuellement
         self.cases_vues = set() # ensemble des indices de cases déjà vues
         
-    def changement_direction(self) -> None:
+    def changement_direction(self,key) -> None:
         """
         Met à jour la direction uniquement lors d'un nouvel appui sur une touche.
         La direction est conservée même si la touche est relâchée.
         """
-        for event in pygame.event.get():
-            # 1. Gestion de la fermeture
-            if event.type == pygame.QUIT:
-                self._running = False
-                return
+        if key == pygame.K_RIGHT:
+            self.direction=K_RIGHT
+        if key == pygame.K_UP:
+            self.direction=K_UP
+        if key == pygame.K_LEFT:
+            self.direction =K_LEFT
+        if key == pygame.K_DOWN:
+            self.direction=K_DOWN
 
-            # 2. Changement de direction (seulement si une touche est ENFONCÉE)
-            if event.type == pygame.KEYDOWN:
-                self.tourner_suivant_key(event.key)
                 
 
     def get_case_absolue(self):
         return self._case.i
 
-    def tourner_suivant_key_ou_deplacer(self,key) -> None:
-        for i in range(4):
-            if(self.touches_direction[i] == key):
-                if(self._direction == i):
-                    self.deplacement()
-                else:
-                    self._direction = i
-                return None
-        
+
                     
-    def deplacement(self)->None:
+    def deplacement(self):
         """
         Dans le cas où le joueur a cliqué sur une flèche du clavier, 
         on change la case sur laquelle il est selon la direction qu'il prend
         en vérifiant d'abord si cette case est accessible
         """
         if self.direction == 4:# non oriente
-            return None
-        if self.case.voisins[self.direction]:# si on peut passer
+            pass
+        if self._case.voisins[self.direction]:# si on peut passer
             match self.direction:
                 case 0:
-                    self._case = self.labyrinthe.cases[self._case.i+1].i
+                    self._case = self.labyrinthe.cases[self._case.i+1]
                 case 1:
-                    self._case = self.labyrinthe.cases[self._case.i-self.labyrinthe.largeur].i
+                    self._case = self.labyrinthe.cases[self._case.i-self.labyrinthe.largeur]
                 case 2:
-                    self._case = self.labyrinthe.cases[self._case.i-1].i
+                    self._case = self.labyrinthe.cases[self._case.i-1]
                 case 3:
-                    self._case = self.labyrinthe.cases[self._case.i+self.labyrinthe.largeur].i
+                    self._case = self.labyrinthe.cases[self._case.i+self.labyrinthe.largeur]
 
                     
     def voir(self):
