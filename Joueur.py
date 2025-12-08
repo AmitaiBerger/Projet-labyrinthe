@@ -24,7 +24,7 @@ class Joueur:
         Met à jour la direction uniquement lors d'un nouvel appui sur une touche.
         La direction est conservée même si la touche est relâchée.
         """
-        if key == pygame.K_RIGHT:
+        if key == 1073741903:
             self.direction=0
         if key == pygame.K_UP:
             self.direction=1
@@ -32,6 +32,7 @@ class Joueur:
             self.direction =2
         if key == pygame.K_DOWN:
             self.direction=3
+
 
                 
 
@@ -46,7 +47,8 @@ class Joueur:
         on change la case sur laquelle il est selon la direction qu'il prend
         en vérifiant d'abord si cette case est accessible
         """
-        if self._direction == 4:# non oriente
+        if self.direction == 4:# non oriente
+            print("rien")
             return
         if self._case.voisins[self.direction]:# si on peut passer
             match self.direction:
