@@ -89,9 +89,9 @@ if __name__=="__main__":
     # définition des couleurs et du style :
     coul_fond = (255,255,255) 
     coul_bouton_clair = (170,170,170)
-    rect = pygame.Rect(100,100,100,50)
-    police_nationale = pygame.font.SysFont('Corbel',35) 
-    click = police_nationale.render("Click me", 1, (0,0,0))
+    rect = pygame.Rect(200,350,220,100)
+    police_nationale = pygame.font.SysFont('Corbel',100) 
+    click = police_nationale.render("Start", 1, (0,0,0))
 
     # affichage des éléments
     text = police_nationale.render('quit' , True , coul_fond) 
@@ -134,8 +134,8 @@ if __name__=="__main__":
 
                         # --- Affichage ---
                         fen1.fill((30, 30, 30))  # gris foncé
-
-                        txt_surface = police_nationale.render("Choisissez une longueur : " + longueur, True, (255, 255, 255))
+                        police = pygame.font.SysFont('Corbel',35) 
+                        txt_surface = police.render("Choisissez une longueur : " + longueur, True, (255, 255, 255))
                         fen1.blit(txt_surface, (20, 80))
 
                         pygame.display.update()
@@ -168,7 +168,7 @@ if __name__=="__main__":
                         # --- Affichage ---
                         fen2.fill((30, 30, 30))  # gris foncé
 
-                        txt_surface = police_nationale.render("Choisissez une largeur: " + largeur, True, (255, 255, 255))
+                        txt_surface = police.render("Choisissez une largeur: " + largeur, True, (255, 255, 255))
                         fen2.blit(txt_surface, (20, 80))
 
                         pygame.display.update()
@@ -183,8 +183,12 @@ if __name__=="__main__":
                     else:
                         partie()
 
-                    
+        image = pygame.image.load("C:\\Users\\amita\\OneDrive\\Documents\\Labyritnhe\\Labyrinthe-Artmazia-76--aurelienpapa-05.jpg")
+
+        image = pygame.transform.scale(image, (200, 150))
         pygame.draw.rect(fenetre, (255, 255,255), rect)
+        fenetre.blit(image, (50, 50))       # position x=50, y=50*
+        
         fenetre.blit(click, rect)
         pygame.display.flip()
         Horloge.tick(60)
