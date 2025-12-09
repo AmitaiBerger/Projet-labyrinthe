@@ -64,6 +64,7 @@ class Joueur:
     def voir(self):
         """Maj le visu_actuel et les cases_vues"""
         self.visu_actuel = set()
+        self.visu_actuel.add(self.get_case_absolue())
         for direction in ["haut","bas","gauche","droite"]:
-            self.visu_actuel = self.visu_actuel.union(self.labyrinthe.cases[self.get_case_absolue()].visibles[direction])             
+            self.visu_actuel = self.visu_actuel.union(self.labyrinthe.cases[self.get_case_absolue()].visibles[direction])
             self.cases_vues = self.cases_vues.union(self.visu_actuel)
