@@ -26,6 +26,11 @@ def partie(taille_laby=(10,10),
     Labyr.afficher_comme_texte()
     Labyr.visibles()
 
+    type_vision = Camera()
+    type_vision.centrage="absolu"
+    type_vision.hauteur_vision=taille_laby[0]
+    type_vision.largeur_vision=taille_laby[1]
+
     # création du Joueur :
     J1 = Joueur.Joueur(Labyr,Labyr.cases[0],(255,0,0),4,5)
     J1.voir()
@@ -34,6 +39,7 @@ def partie(taille_laby=(10,10),
     #vision_init = Labyr.visibles()
     fenetre.fill((255, 255,255))
     pygame.display.update()
+
 
 
     # boucle principale :

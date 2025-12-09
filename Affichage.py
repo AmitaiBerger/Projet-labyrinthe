@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import messagebox
 import pygame
 import math
+from dataclasses import dataclass
 
 class Fenetre:
     def __init__(self):
@@ -19,7 +20,16 @@ class Fenetre:
 
         root.mainloop()
 
-def affiche_labyrinthe(fond,labyrinthe,taille_laby,coul_mur=(0,0,0)):
+@dataclass
+class Camera:
+    """informations d'affichage"""
+    centrage = "absolu" #ou centré sur un élément/joueur
+    hauteur_vision = 0# nb cases 
+    largeur_vision = 0# nb cases
+    
+
+
+def affiche_labyrinthe(fond,labyrinthe,taille_laby,type_vision="absolue",coul_mur=(0,0,0)):
     #utilise pygame pour afficher le labyrinthe
     # taille_laby est la taille en pixels du labyrinthe affiché
     for case in labyrinthe.cases:
@@ -44,20 +54,21 @@ def dessine_case_absolue(case,x_centre,y_centre,taille_case,fond,coul_mur=(0,0,0
     police_nationale = pygame.font.SysFont('Corbel',5) 
     text = police_nationale.render(str(case.i) , True , (0,0,0))
 
-def afficher_joueur(fond,joueur,taille_laby):
+def afficher_joueur(fond,joueur,taille_laby,type_vision="absolue"):
     #utilise pygame pour afficher le joueur
-    taille_case = taille_laby/joueur.labyrinthe.largeur
-    x_centre_case = (joueur.get_case_absolue() % joueur.labyrinthe.largeur + 0.5) * taille_case
-    y_centre_case = (joueur.get_case_absolue() // joueur.labyrinthe.largeur + 0.5) * taille_case
-    pygame.draw.circle(fond,joueur._color,(x_centre_case,y_centre_case),taille_case/4)
+    if type_vision=="absolue":
+        taille_case = taille_laby/joueur.labyrinthe.largeur
+        x_centre_case = (joueur.get_case_absolue() % joueur.labyrinthe.largeur + 0.5) * taille_case
+        y_centre_case = (joueur.get_case_absolue() // joueur.labyrinthe.largeur + 0.5) * taille_case
+        pygame.draw.circle(fond,joueur._color,(x_centre_case,y_centre_case),taille_case/4)
 
-def effacer_joueur(fond,joueur,taille_laby):
+def effacer_joueur(fond,joueur,taille_laby,type_vision="absolue"):
     taille_case = taille_laby/joueur.labyrinthe.largeur
     x_centre_case = (joueur.get_case_absolue() % joueur.labyrinthe.largeur + 0.5) * taille_case
     y_centre_case = (joueur.get_case_absolue() // joueur.labyrinthe.largeur + 0.5) * taille_case
     pygame.draw.circle(fond,(255, 255, 255),(x_centre_case,y_centre_case),taille_case/4)
 
-def affiche_ensemble_de_cases(fond,labyrinthe,ensemble_cases,taille_laby,coul_mur=(0,0,0),directionnel=False):
+def affiche_ensemble_de_cases(fond,labyrinthe,ensemble_cases,taille_laby,coul_mur=(0,0,0),directionnel=False,type_vision="absolue"):
     #utilise pygame pour afficher un ensemble de cases
     # ensemble_cases est un ensemble d'indices de cases
     if not directionnel:
