@@ -2,6 +2,7 @@
 from Laby import *
 import global_data
 import Affichage
+from Affichage import Camera
 import sys 
 import pygame
 pygame.init()
@@ -14,26 +15,27 @@ def partie(taille_laby=(10,10),
     print("lancement d'une partie'")
     # menu principal
     pygame.init() 
-    res = (720,720) 
+    res = (720,720) # taille en pixels de la fenetre
     fenetre = pygame.display.set_mode(res)
     pygame.display.set_caption("Jeu de labyrinthe")
     largeur = taille_laby[1]
-    longueur = taille_laby[0]
+    hauteur = taille_laby[0]
     Horloge = pygame.time.Clock()
 
-    Labyr = Labyrinthe(largeur,longueur)
+    Labyr = Labyrinthe(largeur,hauteur)
     Labyr.generer_par_Wilson()
     Labyr.afficher_comme_texte()
     Labyr.visibles()
 
-    type_vision = Camera()
-    type_vision.centrage="absolu"
-    type_vision.hauteur_vision=taille_laby[0]
-    type_vision.largeur_vision=taille_laby[1]
-
     # création du Joueur :
     J1 = Joueur.Joueur(Labyr,Labyr.cases[0],(255,0,0),4,5)
     J1.voir()
+
+    type_vision = Camera()
+    type_vision.centrage=J1
+    type_vision.hauteur_vision=taille_laby[0]
+    type_vision.largeur_vision=taille_laby[1]
+
 
     # affichage initial
     #vision_init = Labyr.visibles()
@@ -56,8 +58,8 @@ def partie(taille_laby=(10,10),
                 Sortie = True
             if event.type == pygame.KEYDOWN:
                 #on efface la position précédente du joueur et on dessine la nouvelle position
-                Affichage.effacer_joueur(fenetre,J1,min(res[0],res[1]))
-                J1.changement_direction(event.key)
+                Affichage.effacer_joueur(fenetre,J1,min(res[0],res[1]),camera=type_vision)
+                J1.changement_direction(event.key,touches)
                 J1.deplacement()
                 J1.voir()
 
@@ -65,19 +67,22 @@ def partie(taille_laby=(10,10),
                     
         # dessin éléments :
         
+        Affichage.tout_effacer(fenetre)
+
         # dessin du labyrinthe total pour débuggage (en BLEU)
         # pour l'instant, l'affichage se fait en position absolue
-        Affichage.affiche_labyrinthe(fenetre,Labyr,min(res[0],res[1]),coul_mur=(0,0,255))
+        #Affichage.affiche_labyrinthe(fenetre,Labyr,min(res[0],res[1]),coul_mur=(0,0,255))
 
         # dessin des cases déjà vues (en GRIS)
-        Affichage.affiche_ensemble_de_cases(fenetre,Labyr,J1.cases_vues,min(res[0],res[1]),coul_mur=(150,150,150))
+        Affichage.affiche_ensemble_de_cases(fenetre,Labyr,J1.cases_vues,min(res[0],res[1]),coul_mur=(150,150,150),camera=type_vision)
 
         # dessin des cases vues actuellement (en NOIR)
-        Affichage.affiche_ensemble_de_cases(fenetre,Labyr,J1.visu_actuel,min(res[0],res[1]),coul_mur=(0,0,0))
+        Affichage.affiche_ensemble_de_cases(fenetre,Labyr,J1.visu_actuel,min(res[0],res[1]),coul_mur=(0,0,0),camera=type_vision)
 
 
         # dessin du joueur en position absolue (en la couleur du joueur)
-        Affichage.afficher_joueur(fenetre,J1,min(res[0],res[1]))
+        Affichage.afficher_joueur(fenetre,J1,min(res[0],res[1]),camera=type_vision)
+        
                     
         #pygame.display.flip()
         pygame.display.update()
@@ -112,7 +117,9 @@ def affiche_fenetre_selection_valeur(texte="Entrez une valeur", valeur_defaut="1
         # --- Affichage ---
         fen1.fill((30, 30, 30))  # gris foncé
         police = pygame.font.SysFont('Corbel',35)
-        txt_surface = police.render(texte + (valeur if len(valeur)>0 else valeur_defaut), True, (255, 255, 255))
+        txt_surface = police.render(texte + (valeur if len(valeur)>0 else ("*"+str(valeur_defaut))), True, (255, 255, 255))
+        
+        
         fen1.blit(txt_surface, (20, 80))
 
         pygame.display.update()
@@ -172,15 +179,17 @@ if __name__=="__main__":
                 or (event.type==pygame.KEYDOWN 
                     and event.key == pygame.K_RETURN)):
                     pygame.display.quit()
-                    longueur_entree = affiche_fenetre_selection_valeur(texte="longueur du labyrinthe : ",valeur_defaut="10")
-                    largeur_entree = affiche_fenetre_selection_valeur(texte="largeur du labyrinthe : ",valeur_defaut="10")
+                    hauteur_defaut = 10
+                    largeur_defaut = 10
+                    hauteur_entree = affiche_fenetre_selection_valeur(texte="hauteur du labyrinthe : ",valeur_defaut=str(hauteur_defaut))
+                    largeur_entree = affiche_fenetre_selection_valeur(texte="largeur du labyrinthe : ",valeur_defaut=str(largeur_defaut))
                     
-                    if largeur_entree!="" and longueur_entree!="":
-                        largeur=int(largeur_entree)
-                        longueur=int(longueur_entree)
-                        partie((largeur,longueur))
-                    else:
-                        partie()
+                    if largeur_entree == "":
+                        largeur_entree = largeur_defaut
+                    if hauteur_entree == "":
+                        hauteur_entree = hauteur_defaut
+                    
+                    partie((int(largeur_entree),int(hauteur_entree)))
 
         
         pygame.draw.rect(fenetre, (255, 255,255), rect)

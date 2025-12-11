@@ -19,19 +19,23 @@ class Joueur:
         self.visu_actuel = set() # ensemble des indices de cases visibles actuellement
         self.cases_vues = set() # ensemble des indices de cases déjà vues
         
-    def changement_direction(self,key) -> None:
+    def changement_direction(self,key,touches=None) -> None:
         """
         Met à jour la direction uniquement lors d'un nouvel appui sur une touche.
         La direction est conservée même si la touche est relâchée.
         """
         if key == pygame.K_RIGHT:
-            self.direction=0
+            self._direction=0
         if key == pygame.K_UP:
-            self.direction=1
+            self._direction=1
         if key == pygame.K_LEFT:
-            self.direction =2
+            self._direction =2
         if key == pygame.K_DOWN:
-            self.direction=3
+            self._direction=3
+        if touches!=None:
+            for i in range(4):
+                if key == touches[i]:
+                    self._direction=i
 
 
                 
@@ -47,10 +51,11 @@ class Joueur:
         on change la case sur laquelle il est selon la direction qu'il prend
         en vérifiant d'abord si cette case est accessible
         """
-        if self.direction == 4:# non oriente
+        #print("deplacement dans la direction ",self._direction)
+        if self._direction == 4:# non oriente
             return
-        if self._case.voisins[self.direction]:# si on peut passer
-            match self.direction:
+        if self._case.voisins[self._direction]:# si on peut passer
+            match self._direction:
                 case 0:
                     self._case = self.labyrinthe.cases[self._case.i+1]
                 case 1:

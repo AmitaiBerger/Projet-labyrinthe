@@ -23,7 +23,7 @@ class Labyrinthe():
         self.cases = [Case(i) for i in range(largeur * hauteur)]
         self.largeur=largeur
         self.hauteur=hauteur
-        self.sortie = random.randint(0, self.largeur*self.hauteur)
+        self.sortie = random.randint(0, self.largeur*self.hauteur-1)
 
     def trier_cases(self):
         """Trie le tableau self.cases selon l'attribut i de chaque case
