@@ -26,7 +26,7 @@ class Camera:
     """informations d'affichage"""
     centrage : str = "absolu" #ou centré sur un élément/joueur auquel cas contient l'objet cible
     hauteur_vision : int=0# nb cases 
-    largeur_vision : int=0# nb cases
+    largeur_vision : int=0# nb cases total de gauche à droite
     
 
 
@@ -40,6 +40,7 @@ def affiche_labyrinthe(fond,labyrinthe,taille_laby,coul_mur=(0,0,0)):
         dessine_case_absolue(case,x_centre_case,y_centre_case,taille_case,fond,coul_mur)
     
 def dessine_case_absolue(case,x_centre,y_centre,taille_case,fond,coul_mur=(0,0,0)):
+    """Dessine une case à partir des coordonnées en pixels exactes et absolues de son centre"""
     for i in range(len(case.voisins)):
         # affiche une ligne orthogonale entre les deux cases s'ils ne sont pas voisins
         # rien sinon
@@ -52,8 +53,11 @@ def dessine_case_absolue(case,x_centre,y_centre,taille_case,fond,coul_mur=(0,0,0
                               y_centre+math.sin((-i/4-1/8)*2*math.pi)*taille_case*math.sqrt(2)/2],
                              [x_centre+math.cos((-i/4+1/8)*2*math.pi)*taille_case*math.sqrt(2)/2,
                               y_centre+math.sin((-i/4+1/8)*2*math.pi)*taille_case*math.sqrt(2)/2],3)
-    police_nationale = pygame.font.SysFont('Corbel',5) 
-    text = police_nationale.render(str(case.i) , True , (0,0,0))
+    police_nationale = pygame.font.SysFont('Corbel',int(taille_case)//3) 
+    texte_sortie = police_nationale.render("#" , True , (0,0,0))
+    if(case.contenu == "Sortie"):
+        fond.blit(texte_sortie, (x_centre - taille_case/4, y_centre - taille_case/4))
+    #fenetre.blit(text, rect)
 
 def afficher_joueur(fond,joueur,taille_laby,camera=None,coul_partic=None):
     #utilise pygame pour afficher le joueur
@@ -101,11 +105,17 @@ def affiche_ensemble_de_cases(fond,labyrinthe,ensemble_cases,taille_laby,coul_mu
                 taille_case = taille_laby/camera.largeur_vision
                 case_centre = camera.centrage.get_case_absolue()
                 
-                x_centre_case = (case.i % labyrinthe.largeur - case_centre % labyrinthe.largeur# le centre en haut à gauche
+                x_centre_case = (case.i % labyrinthe.largeur - (case_centre % labyrinthe.largeur)# le centre en haut à gauche
                                   + camera.largeur_vision/2) * taille_case#le centre au centre
-                y_centre_case = (case.i // labyrinthe.largeur - case_centre // labyrinthe.largeur
-                                  + camera.hauteur_vision/2-1) * taille_case
-                dessine_case_absolue(case,x_centre_case,y_centre_case,taille_case,fond,coul_mur)
+                y_centre_case = (case.i // labyrinthe.largeur - (case_centre // labyrinthe.largeur)
+                                  + camera.hauteur_vision/2) * taille_case
+                
+                if(x_centre_case>=-taille_case/2 and x_centre_case<=taille_laby+taille_case/2
+                   and y_centre_case>=-taille_case/2 and y_centre_case<=taille_laby+taille_case/2):
+                    #print("case centre=",case_centre)
+                    #print("case i=",case.i)
+                    #print("x_centre =",x_centre_case/taille_case," y_centre =",y_centre_case/taille_case)
+                    dessine_case_absolue(case,x_centre_case,y_centre_case,taille_case,fond,coul_mur)
         else:
             print("camera.centrage=",camera.centrage)
             raise ValueError("type de centrage inconnu pour l'affichage des cases")

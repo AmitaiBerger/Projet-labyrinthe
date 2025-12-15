@@ -41,6 +41,7 @@ class Joueur:
                 
 
     def get_case_absolue(self):
+        """renvoie l'indice de la case"""
         return self._case.i
 
 

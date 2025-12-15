@@ -24,6 +24,7 @@ def partie(taille_laby=(10,10),
 
     Labyr = Labyrinthe(largeur,hauteur)
     Labyr.generer_par_Wilson()
+    Labyr.placer_depart(ratio_distance_min=0.7)
     Labyr.afficher_comme_texte()
     Labyr.visibles()
 
@@ -33,8 +34,9 @@ def partie(taille_laby=(10,10),
 
     type_vision = Camera()
     type_vision.centrage=J1
-    type_vision.hauteur_vision=taille_laby[0]
-    type_vision.largeur_vision=taille_laby[1]
+    dimension_min_laby = min(taille_laby[0],taille_laby[1])
+    type_vision.hauteur_vision=dimension_min_laby
+    type_vision.largeur_vision=dimension_min_laby
 
 
     # affichage initial
@@ -63,6 +65,10 @@ def partie(taille_laby=(10,10),
                 J1.deplacement()
                 J1.voir()
 
+                if(J1.get_case_absolue() == Labyr.sortie):
+                    print("Vous avez gagné !")
+                    Sortie = True
+
 
                     
         # dessin éléments :
@@ -87,6 +93,28 @@ def partie(taille_laby=(10,10),
         #pygame.display.flip()
         pygame.display.update()
         Horloge.tick(60)
+
+    affiche_fenetre_victoire()
+    pygame.display.quit()
+
+
+def affiche_fenetre_victoire():
+    pygame.init() 
+    res = (420,420) # taille en pixels de la fenetre
+    fenetre = pygame.display.set_mode(res)
+    police_nationale = pygame.font.SysFont('Corbel',res[1]//10) 
+    texte_victoire = police_nationale.render("Vous avez gagné !" , True , (0,0,0))
+    fenetre.fill((255, 255,255))
+    fenetre.blit(texte_victoire, (res[0]//10, res[1]//2 - res[1]//10))
+    pygame.display.update()
+    attente = True
+    while attente:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                attente = False
+            if event.type == pygame.KEYDOWN:
+                attente = False
+    pygame.display.quit()
 
 def affiche_fenetre_selection_valeur(texte="Entrez une valeur", valeur_defaut="10"):
     #On ouvre une fenetre qui demande à  l'utilisateur d'entrer la taille du labyrinthe
@@ -159,7 +187,7 @@ if __name__=="__main__":
     largeur_rect = largeur//10
     hauteur_rect = hauteur//10
     rect = pygame.Rect(largeur//2-largeur_rect//2,hauteur//2-hauteur_rect//2,largeur_rect,hauteur_rect)
-    police_nationale = pygame.font.SysFont('Corbel',100) 
+    police_nationale = pygame.font.SysFont('Corbel',res[1]//10) 
     click = police_nationale.render("Start", 1, (0,0,0))
 
     # affichage des éléments
@@ -194,7 +222,6 @@ if __name__=="__main__":
         
         pygame.draw.rect(fenetre, (255, 255,255), rect)
         fenetre.blit(image, (0, 0))      
-        fenetre.blit(click, rect)
         pygame.display.flip()
         Horloge.tick(60)
 

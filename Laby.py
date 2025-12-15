@@ -430,7 +430,7 @@ class Labyrinthe():
             self.depart = max(distances, key=distances.get)
         else:
             self.depart = random.choice(candidats_depart)
-            
+        self.cases[self.sortie].contenu = "Sortie"
         print(f"Jeu configuré : Départ {self.depart} -> Sortie {self.sortie} (Distance: {distances[self.depart]})")
 
     def creuser_trous_organiques(self, seuil_min: int = 5, longueur_ref: int = 15):
