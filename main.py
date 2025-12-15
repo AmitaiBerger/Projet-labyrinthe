@@ -21,6 +21,7 @@ def partie(taille_laby=(10,10),
     largeur = taille_laby[1]
     hauteur = taille_laby[0]
     Horloge = pygame.time.Clock()
+    fps_max = 60# fps_max
 
     Labyr = Labyrinthe(largeur,hauteur)
     Labyr.generer_par_Wilson()
@@ -48,6 +49,7 @@ def partie(taille_laby=(10,10),
 
     # boucle principale :
     Sortie = False
+    duree_totale = 0
 
     print("lancement de la boucle principale")
 
@@ -92,18 +94,19 @@ def partie(taille_laby=(10,10),
                     
         #pygame.display.flip()
         pygame.display.update()
-        Horloge.tick(60)
+        Horloge.tick(fps_max)
+        duree_totale += Horloge.get_time()
 
-    affiche_fenetre_victoire()
+    affiche_fenetre_victoire(duree_totale/1000)
     pygame.display.quit()
 
 
-def affiche_fenetre_victoire():
+def affiche_fenetre_victoire(nb_ticks):
     pygame.init() 
-    res = (420,420) # taille en pixels de la fenetre
+    res = (620,220) # taille en pixels de la fenetre
     fenetre = pygame.display.set_mode(res)
     police_nationale = pygame.font.SysFont('Corbel',res[1]//10) 
-    texte_victoire = police_nationale.render("Vous avez gagné !" , True , (0,0,0))
+    texte_victoire = police_nationale.render("Vous avez gagné en "+str(nb_ticks)+" secondes !" , True , (0,0,0))
     fenetre.fill((255, 255,255))
     fenetre.blit(texte_victoire, (res[0]//10, res[1]//2 - res[1]//10))
     pygame.display.update()
@@ -176,24 +179,28 @@ if __name__=="__main__":
     LARGEUR = 750
     res = (LARGEUR,HAUTEUR) 
     fenetre = pygame.display.set_mode(res)
-    largeur = fenetre.get_width()  
-    hauteur = fenetre.get_height() #??
+    #largeur = fenetre.get_width()  
+    #hauteur = fenetre.get_height() #??
     Horloge = pygame.time.Clock()
 
     # définition des couleurs et du style :
     coul_fond = (255,255,255) 
     coul_bouton_clair = (170,170,170)
 
-    largeur_rect = largeur//10
-    hauteur_rect = hauteur//10
-    rect = pygame.Rect(largeur//2-largeur_rect//2,hauteur//2-hauteur_rect//2,largeur_rect,hauteur_rect)
+    largeur_rect = LARGEUR//10
+    hauteur_rect = HAUTEUR//10
+    rect = pygame.Rect(LARGEUR//2-largeur_rect//2,HAUTEUR//2-hauteur_rect//2,largeur_rect,hauteur_rect)
     police_nationale = pygame.font.SysFont('Corbel',res[1]//10) 
     click = police_nationale.render("Start", 1, (0,0,0))
 
+
+    
     # affichage des éléments
-    text = police_nationale.render('quit' , True , coul_fond) 
     image = pygame.image.load("Projet-labyrinthe/loading_image.png")
     image = pygame.transform.scale(image, res)
+    #affichage du rect (bouton sur lequel est ajouté text) :
+    pygame.draw.rect(fenetre, coul_bouton_clair, rect)
+    text = police_nationale.render('quit' , True , coul_fond) 
 
     # boucle principale menu :
     while True:
