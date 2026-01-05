@@ -39,8 +39,10 @@ def affiche_labyrinthe(fond,labyrinthe,taille_laby,coul_mur=(0,0,0)):
         y_centre_case = (case.i // labyrinthe.largeur + 0.5) * taille_case
         dessine_case_absolue(case,x_centre_case,y_centre_case,taille_case,fond,coul_mur)
     
-def dessine_case_absolue(case,x_centre,y_centre,taille_case,fond,coul_mur=(0,0,0)):
-    """Dessine une case à partir des coordonnées en pixels exactes et absolues de son centre"""
+def dessine_case_absolue(case,x_centre:int,y_centre:int,taille_case:int,
+                            fond,coul_mur=(0,0,0),afficher_images=True):
+    """Dessine une case à partir des coordonnées en pixels exactes et absolues de son centre
+        afficher_images : booléen, si True affiche une image pour la sortie"""
     for i in range(len(case.voisins)):
         # affiche une ligne orthogonale entre les deux cases s'ils ne sont pas voisins
         # rien sinon
@@ -53,10 +55,17 @@ def dessine_case_absolue(case,x_centre,y_centre,taille_case,fond,coul_mur=(0,0,0
                               y_centre+math.sin((-i/4-1/8)*2*math.pi)*taille_case*math.sqrt(2)/2],
                              [x_centre+math.cos((-i/4+1/8)*2*math.pi)*taille_case*math.sqrt(2)/2,
                               y_centre+math.sin((-i/4+1/8)*2*math.pi)*taille_case*math.sqrt(2)/2],3)
-    police_nationale = pygame.font.SysFont('Corbel',int(taille_case)//3) 
-    texte_sortie = police_nationale.render("#" , True , (0,0,0))
-    if(case.contenu == "Sortie"):
-        fond.blit(texte_sortie, (x_centre - taille_case/4, y_centre - taille_case/4))
+    
+    if(case.contenu == "Sortie"): 
+        if(afficher_images):
+            taille_image = int(taille_case*0.75)
+            image_sortie = pygame.image.load("images/sortie.png")
+            image_sortie = pygame.transform.scale(image_sortie,(taille_image,taille_image))
+            fond.blit(image_sortie,(x_centre - taille_image/2, y_centre - taille_image/2))
+        else:
+            police_nationale = pygame.font.SysFont('Corbel',int(taille_case)//3)
+            texte_sortie = police_nationale.render("#" , True , (0,0,0))
+            fond.blit(texte_sortie, (x_centre - taille_case/4, y_centre - taille_case/4))
     #fenetre.blit(text, rect)
 
 def afficher_joueur(fond,joueur,taille_laby,camera=None,coul_partic=None):
