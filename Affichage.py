@@ -59,7 +59,7 @@ def dessine_case_absolue(case,x_centre:int,y_centre:int,taille_case:int,
     if(case.contenu == "Sortie"): 
         if(afficher_images):
             taille_image = int(taille_case*0.75)
-            image_sortie = pygame.image.load("images/sortie.png")
+            image_sortie = pygame.image.load("ressources/escalier.png")
             image_sortie = pygame.transform.scale(image_sortie,(taille_image,taille_image))
             fond.blit(image_sortie,(x_centre - taille_image/2, y_centre - taille_image/2))
         else:

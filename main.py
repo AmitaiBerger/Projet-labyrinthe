@@ -196,7 +196,7 @@ if __name__=="__main__":
 
     
     # affichage des éléments
-    image = pygame.image.load("loading_image.png")
+    image = pygame.image.load("ressources/loading_image.png")
     image = pygame.transform.scale(image, res)
     #affichage du rect (bouton sur lequel est ajouté text) :
     pygame.draw.rect(fenetre, coul_bouton_clair, rect)
