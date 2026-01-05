@@ -10,7 +10,7 @@ import Joueur
 
 def partie(taille_laby=(10,10),
         coul_fond=(255,255,255), coul_bouton_clair=(170,170,170),police_nationale=pygame.font.SysFont('Corbel',35),
-        touches = [pygame.K_z, pygame.K_q, pygame.K_s, pygame.K_d]):
+        touches = [pygame.K_z, pygame.K_q, pygame.K_s, pygame.K_d],debug=False):
     """ boucle principale du jeu. Prend en argument les paramètre graphiques du style"""
     print("lancement d'une partie'")
     # menu principal
@@ -26,7 +26,8 @@ def partie(taille_laby=(10,10),
     Labyr = Labyrinthe(largeur,hauteur)
     Labyr.generer_par_Wilson()
     Labyr.placer_depart(ratio_distance_min=0.7)
-    Labyr.afficher_comme_texte()
+    if debug:
+        Labyr.afficher_comme_texte()
     Labyr.visibles()
 
     # création du Joueur :
@@ -49,6 +50,7 @@ def partie(taille_laby=(10,10),
 
     # boucle principale :
     Sortie = False
+    Defaite = False
     duree_totale = 0
 
     print("lancement de la boucle principale")
@@ -60,6 +62,7 @@ def partie(taille_laby=(10,10),
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 Sortie = True
+                Defaite = True
             if event.type == pygame.KEYDOWN:
                 #on efface la position précédente du joueur et on dessine la nouvelle position
                 Affichage.effacer_joueur(fenetre,J1,min(res[0],res[1]),camera=type_vision)
@@ -97,7 +100,8 @@ def partie(taille_laby=(10,10),
         Horloge.tick(fps_max)
         duree_totale += Horloge.get_time()
 
-    affiche_fenetre_victoire(duree_totale/1000)
+    if not Defaite:
+        affiche_fenetre_victoire(duree_totale/1000)
     pygame.display.quit()
 
 
@@ -160,18 +164,20 @@ def affiche_fenetre_selection_valeur(texte="Entrez une valeur", valeur_defaut="1
     return valeur
 
 if __name__=="__main__":
-    Labyr = Labyrinthe(10,10)
-    Labyr.generer_par_Wilson()
-    #Labyr.creuser_trous()
-    Labyr.creuser_trous_intelligents(longueur_max_probabilite=5)
-    #Labyr.placer_depart(ratio_distance_min=0.7)
-    Labyr.placer_deux_joueurs(ratio_eloignement=0.6)
-    #Labyr.creuser_trous_organiques(seuil_min=6, longueur_ref=20)
-    print("coordonnées 5,5 :", Labyr.cases[5*Labyr.largeur+5].voisins)
-    Labyr.afficher_comme_texte()
-    Labyr.visibles()
-    print("vision  depuis la case 5,5 :", Labyr.cases[5*Labyr.largeur+5].visibles)
-    print("vision  depuis la case 4,4 :", Labyr.cases[4*Labyr.largeur+4].visibles)
+    test_console = False
+    if test_console:
+        Labyr = Labyrinthe(10,10)
+        Labyr.generer_par_Wilson()
+        #Labyr.creuser_trous()
+        Labyr.creuser_trous_intelligents(longueur_max_probabilite=5)
+        #Labyr.placer_depart(ratio_distance_min=0.7)
+        Labyr.placer_deux_joueurs(ratio_eloignement=0.6)
+        #Labyr.creuser_trous_organiques(seuil_min=6, longueur_ref=20)
+        print("coordonnées 5,5 :", Labyr.cases[5*Labyr.largeur+5].voisins)
+        Labyr.afficher_comme_texte()
+        Labyr.visibles()
+        print("vision  depuis la case 5,5 :", Labyr.cases[5*Labyr.largeur+5].visibles)
+        print("vision  depuis la case 4,4 :", Labyr.cases[4*Labyr.largeur+4].visibles)
 
     # menu principal
     pygame.init() 
@@ -185,34 +191,36 @@ if __name__=="__main__":
 
     # définition des couleurs et du style :
     coul_fond = (255,255,255) 
-    coul_bouton_clair = (170,170,170)
+    coul_bouton_clair = (200,240,200)
 
-    largeur_rect = LARGEUR//10
+    largeur_rect = LARGEUR//6
     hauteur_rect = HAUTEUR//10
-    rect = pygame.Rect(LARGEUR//2-largeur_rect//2,HAUTEUR//2-hauteur_rect//2,largeur_rect,hauteur_rect)
+    dist_inter_rect = 10
+    rect_click = pygame.Rect(LARGEUR//2-largeur_rect//2,HAUTEUR//2-hauteur_rect//2,largeur_rect,hauteur_rect)
     police_nationale = pygame.font.SysFont('Corbel',res[1]//10) 
-    click = police_nationale.render("Start", 1, (0,0,0))
+    text_click = police_nationale.render("Start", 1, (0,0,0))
+
+
+    text_quit = police_nationale.render('Quit' , True , (0,0,0)) 
+    rect_quit = pygame.Rect(LARGEUR//2-largeur_rect//2,HAUTEUR//2-hauteur_rect//2+dist_inter_rect+hauteur_rect,largeur_rect,hauteur_rect)
 
 
     
     # affichage des éléments
     image = pygame.image.load("ressources/loading_image.png")
     image = pygame.transform.scale(image, res)
-    #affichage du rect (bouton sur lequel est ajouté text) :
-    pygame.draw.rect(fenetre, coul_bouton_clair, rect)
-    text = police_nationale.render('quit' , True , coul_fond) 
 
     # boucle principale menu :
     while True:
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
+            if event.type == pygame.QUIT or (event.type==pygame.KEYDOWN and event.key==pygame.K_ESCAPE):
                 pygame.quit()
                 sys.exit()
             #On detecte si on clique sur la souris, ce qui ferme le menu et lance la partie 
             if ((event.type == pygame.MOUSEBUTTONUP 
-                    and rect.collidepoint(pygame.mouse.get_pos())) 
+                    and rect_click.collidepoint(pygame.mouse.get_pos())) 
                 or (event.type==pygame.KEYDOWN 
-                    and event.key == pygame.K_RETURN)):
+                    and (event.key == pygame.K_RETURN or event.key == pygame.K_s))):
                     pygame.display.quit()
                     hauteur_defaut = 10
                     largeur_defaut = 10
@@ -225,10 +233,19 @@ if __name__=="__main__":
                         hauteur_entree = hauteur_defaut
                     
                     partie((int(largeur_entree),int(hauteur_entree)))
+                    pygame.quit()
+                    sys.exit()
 
         
-        pygame.draw.rect(fenetre, (255, 255,255), rect)
+        #pygame.draw.rect(fenetre, (255, 255,255), rect_click)
         fenetre.blit(image, (0, 0))      
+        #affichage du rect (bouton sur lequel est ajouté text) :
+        pygame.draw.rect(fenetre, coul_bouton_clair, rect_click)
+        fenetre.blit(text_click, (LARGEUR//2-text_click.get_width()//2,HAUTEUR//2-text_click.get_height()//2))
+        
+        pygame.draw.rect(fenetre, coul_bouton_clair, rect_quit)
+        fenetre.blit(text_quit, (LARGEUR//2-text_quit.get_width()//2, rect_quit.y + hauteur_rect//2 - text_quit.get_height()//2))
+
         pygame.display.flip()
         Horloge.tick(60)
 

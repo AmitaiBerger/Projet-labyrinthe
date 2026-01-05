@@ -406,7 +406,7 @@ class Labyrinthe():
                         pile.append((v, chemin + [v]))
         return []
 
-    def placer_depart(self, ratio_distance_min: float = 0.6):
+    def placer_depart(self, ratio_distance_min: float = 0.6,debug=False):
         """
         1. Place la sortie (trappe) au hasard.
         2. Place le départ à une distance suffisante.
@@ -431,7 +431,8 @@ class Labyrinthe():
         else:
             self.depart = random.choice(candidats_depart)
         self.cases[self.sortie].contenu = "Sortie"
-        print(f"Jeu configuré : Départ {self.depart} -> Sortie {self.sortie} (Distance: {distances[self.depart]})")
+        if debug:
+            print(f"Jeu configuré : Départ {self.depart} -> Sortie {self.sortie} (Distance: {distances[self.depart]})")
 
     def creuser_trous_organiques(self, seuil_min: int = 5, longueur_ref: int = 15):
         """
