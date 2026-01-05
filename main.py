@@ -8,7 +8,7 @@ import pygame
 pygame.init()
 import Joueur
 
-def partie(taille_laby=(10,10),
+def partie(taille_laby=(10,10),mode_de_jeu="solo",
         coul_fond=(255,255,255), coul_bouton_clair=(170,170,170),police_nationale=pygame.font.SysFont('Corbel',35),
         touches = [pygame.K_z, pygame.K_q, pygame.K_s, pygame.K_d],debug=False):
     """ boucle principale du jeu. Prend en argument les paramètre graphiques du style"""
@@ -33,6 +33,11 @@ def partie(taille_laby=(10,10),
     # création du Joueur :
     J1 = Joueur.Joueur(Labyr,Labyr.cases[0],(255,0,0),4,5)
     J1.voir()
+
+    if mode_de_jeu=="robot":
+        BOT = Joueur.Joueur(Labyr,Labyr.cases[0],(0,0,255),4,5)
+        BOT.voir()
+    
 
     type_vision = Camera()
     type_vision.centrage=J1
@@ -196,13 +201,16 @@ if __name__=="__main__":
     largeur_rect = LARGEUR//6
     hauteur_rect = HAUTEUR//10
     dist_inter_rect = 10
-    rect_click = pygame.Rect(LARGEUR//2-largeur_rect//2,HAUTEUR//2-hauteur_rect//2,largeur_rect,hauteur_rect)
+    
     police_nationale = pygame.font.SysFont('Corbel',res[1]//10) 
-    text_click = police_nationale.render("Start", 1, (0,0,0))
+    text_click = police_nationale.render("jeu Solo", 1, (0,0,0))
+    rect_click = pygame.Rect(LARGEUR//2-largeur_rect//2,HAUTEUR//2-hauteur_rect//2,largeur_rect,hauteur_rect)
 
+    text_VS_robot = police_nationale.render("VS Robot", 1, (100,100,100))
+    rect_VS_robot = pygame.Rect(LARGEUR//2-largeur_rect//2,HAUTEUR//2-hauteur_rect//2+dist_inter_rect+hauteur_rect,largeur_rect,hauteur_rect)
 
-    text_quit = police_nationale.render('Quit' , True , (0,0,0)) 
-    rect_quit = pygame.Rect(LARGEUR//2-largeur_rect//2,HAUTEUR//2-hauteur_rect//2+dist_inter_rect+hauteur_rect,largeur_rect,hauteur_rect)
+    text_quit = police_nationale.render('Quitter' , True , (0,0,0)) 
+    rect_quit = pygame.Rect(LARGEUR//2-largeur_rect//2,HAUTEUR//2-hauteur_rect//2+2*dist_inter_rect+2*hauteur_rect,largeur_rect,hauteur_rect)
 
 
     
@@ -213,14 +221,17 @@ if __name__=="__main__":
     # boucle principale menu :
     while True:
         for event in pygame.event.get():
-            if event.type == pygame.QUIT or (event.type==pygame.KEYDOWN and event.key==pygame.K_ESCAPE):
+            if (event.type == pygame.QUIT or (event.type==pygame.KEYDOWN and event.key==pygame.K_ESCAPE)
+                                        or (event.type==pygame.MOUSEBUTTONUP and rect_quit.collidepoint(pygame.mouse.get_pos()))):
                 pygame.quit()
                 sys.exit()
             #On detecte si on clique sur la souris, ce qui ferme le menu et lance la partie 
             if ((event.type == pygame.MOUSEBUTTONUP 
-                    and rect_click.collidepoint(pygame.mouse.get_pos())) 
+                    and (rect_click.collidepoint(pygame.mouse.get_pos())
+                         or rect_VS_robot.collidepoint(pygame.mouse.get_pos()))) 
                 or (event.type==pygame.KEYDOWN 
-                    and (event.key == pygame.K_RETURN or event.key == pygame.K_s))):
+                    and (event.key == pygame.K_RETURN or event.key == pygame.K_s
+                         or event.key == pygame.K_r))):
                     pygame.display.quit()
                     hauteur_defaut = 10
                     largeur_defaut = 10
@@ -232,7 +243,12 @@ if __name__=="__main__":
                     if hauteur_entree == "":
                         hauteur_entree = hauteur_defaut
                     
-                    partie((int(largeur_entree),int(hauteur_entree)))
+                    if((event.type == pygame.MOUSEBUTTONUP and rect_click.collidepoint(pygame.mouse.get_pos())) 
+                       or (event.type==pygame.KEYDOWN 
+                    and (event.key == pygame.K_RETURN or event.key == pygame.K_s))):
+                        partie((int(largeur_entree),int(hauteur_entree)),mode_de_jeu="solo")
+                    else:
+                        partie((int(largeur_entree),int(hauteur_entree)),mode_de_jeu="robot")
                     pygame.quit()
                     sys.exit()
 
@@ -242,6 +258,9 @@ if __name__=="__main__":
         #affichage du rect (bouton sur lequel est ajouté text) :
         pygame.draw.rect(fenetre, coul_bouton_clair, rect_click)
         fenetre.blit(text_click, (LARGEUR//2-text_click.get_width()//2,HAUTEUR//2-text_click.get_height()//2))
+        
+        pygame.draw.rect(fenetre, coul_bouton_clair, rect_VS_robot)
+        fenetre.blit(text_VS_robot, (LARGEUR//2-text_VS_robot.get_width()//2, rect_VS_robot.y + hauteur_rect//2 - text_VS_robot.get_height()//2))
         
         pygame.draw.rect(fenetre, coul_bouton_clair, rect_quit)
         fenetre.blit(text_quit, (LARGEUR//2-text_quit.get_width()//2, rect_quit.y + hauteur_rect//2 - text_quit.get_height()//2))
