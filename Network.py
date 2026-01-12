@@ -2,25 +2,30 @@ import socket
 import pickle
 
 class Network:
-    def __init__(self):
+    def __init__(self, ip="localhost"):
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.server = "localhost" # "localhost" pour tester sur le même PC, ou l'IP du serveur
+        self.server = ip
         self.port = 5555
         self.addr = (self.server, self.port)
+        # Lors de la connexion, on récupère un tuple : (Labyrinthe, id_joueur)
         self.p = self.connect()
 
     def connect(self):
         try:
             self.client.connect(self.addr)
-            # Au moment de la connexion, on reçoit le labyrinthe initial
-            return pickle.loads(self.client.recv(4096*8)) 
-        except:
-            pass
+            # On augmente la taille du buffer car le Labyrinthe est un gros objet
+            return pickle.loads(self.client.recv(4096*16))
+        except socket.error as e:
+            print("Erreur de connexion :", e)
+            return None
 
     def send(self, data):
-        """Envoyer sa position et recevoir celle de l'adversaire"""
+        """
+        Envoie sa position (int) et reçoit celle de l'adversaire (int)
+        """
         try:
             self.client.send(pickle.dumps(data))
-            return pickle.loads(self.client.recv(2048*2))
+            return pickle.loads(self.client.recv(2048))
         except socket.error as e:
             print(e)
+            return None

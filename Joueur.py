@@ -1,8 +1,5 @@
 import pygame
-import random
-
 from global_data import *
-
 
 class Joueur:
     """
@@ -10,7 +7,7 @@ class Joueur:
     (0,1,2,3 correspondant à la meme chose que dans Case),
     et un running pour signaler s'il faut stopper le jeu
     """
-    def __init__(self,labyrinthe,case,color,direction,speed,reflection="humain"):
+    def __init__(self,labyrinthe,case,color,direction,speed):
         self._case = case # Case actuelle. Attribut privé car son indice sera inconnue par le joueur durant la partie
         self._color = color
         self._direction = direction # Doit être initialisé à une direction valide
@@ -19,9 +16,7 @@ class Joueur:
         self.labyrinthe = labyrinthe
         self.visu_actuel = set() # ensemble des indices de cases visibles actuellement
         self.cases_vues = set() # ensemble des indices de cases déjà vues
-        self.reflexion = reflection # "humain" ou le mode de reflexion de l'IA ("aléatoire","profondeur","explorateur")
-        if(self.reflexion == "explorateur"):
-            self.taux_exploration_cases = {}# dictionnaire qui quantifie le taux d'exploration de chaque case
+        
     def changement_direction(self,key,touches=None) -> None:
         """
         Met à jour la direction uniquement lors d'un nouvel appui sur une touche.
@@ -43,6 +38,11 @@ class Joueur:
     def get_case_absolue(self):
         """renvoie l'indice de la case"""
         return self._case.i
+    
+    def set_case_absolue(self, indice):
+        """Force la position du joueur (utile pour le réseau)"""
+        if 0 <= indice < len(self.labyrinthe.cases):
+            self._case = self.labyrinthe.cases[indice]
                    
     def deplacement(self):
         """
@@ -50,7 +50,6 @@ class Joueur:
         on change la case sur laquelle il est selon la direction qu'il prend
         en vérifiant d'abord si cette case est accessible
         """
-        #print("deplacement dans la direction ",self._direction)
         if self._direction == 4:# non oriente
             return
         if self._case.voisins[self._direction]:# si on peut passer
@@ -63,51 +62,13 @@ class Joueur:
                     self._case = self.labyrinthe.cases[self._case.i-1]
                 case 3:
                     self._case = self.labyrinthe.cases[self._case.i+self.labyrinthe.largeur]
-            if self.reflexion == "explorateur":
-                if self._case.i not in self.taux_exploration_cases:
-                    self.taux_exploration_cases[self._case.i] = 0
-                self.taux_exploration_cases[self._case.i] += 1
                  
     def voir(self):
         """Maj le visu_actuel et les cases_vues"""
         self.visu_actuel = set()
         self.visu_actuel.add(self.get_case_absolue())
         for direction in ["haut","bas","gauche","droite"]:
-            self.visu_actuel = self.visu_actuel.union(self.labyrinthe.cases[self.get_case_absolue()].visibles[direction])
-            self.cases_vues = self.cases_vues.union(self.visu_actuel)
-    
-    def choisir_case(self)->int:
-        """Choisit un indice de case parmi les cases voisines en fonction de la réflexion choisie"""
-        if self.reflexion == "aléatoire":
-            voisins_accessibles = []
-            for i in range(4):
-                if self._case.voisins[i]:
-                    voisins_accessibles.append(i)
-            if len(voisins_accessibles)>0:
-                return random.choice(voisins_accessibles)
-        elif self.reflexion == "explorateur":
-            voisins_accessibles = []
-            taux_exploration_voisins = []
-            for i in range(4):
-                if self._case.voisins[i]:
-                    voisins_accessibles.append(i)
-                    case_voisine = None
-                    match i:
-                        case 0:
-                            case_voisine = self.labyrinthe.cases[self._case.i+1]
-                        case 1:
-                            case_voisine = self.labyrinthe.cases[self._case.i - self.labyrinthe.largeur]
-                        case 2:
-                            case_voisine = self.labyrinthe.cases[self._case.i-1]
-                        case 3:
-                            case_voisine = self.labyrinthe.cases[self._case.i + self.labyrinthe.largeur]
-                    if case_voisine.i in self.taux_exploration_cases:
-                        taux_exploration_voisins.append(self.taux_exploration_cases[case_voisine.i])
-                    else:
-                        taux_exploration_voisins.append(0)
-            if len(voisins_accessibles)>0:
-                min_taux = min(taux_exploration_voisins)
-                meilleurs_voisins = [voisins_accessibles[i] for i in range(len(voisins_accessibles)) if taux_exploration_voisins[i]==min_taux]
-                return random.choice(meilleurs_voisins)
-            return random.choice(voisins_accessibles)
-        return 4
+            # Vérification de sécurité pour éviter les crashs si la structure visible est vide
+            if direction in self.labyrinthe.cases[self.get_case_absolue()].visibles:
+                self.visu_actuel = self.visu_actuel.union(self.labyrinthe.cases[self.get_case_absolue()].visibles[direction])
+        self.cases_vues = self.cases_vues.union(self.visu_actuel)
