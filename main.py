@@ -10,7 +10,7 @@ import Joueur
 
 def partie(taille_laby=(10,10),mode_de_jeu="solo",
         coul_fond=(255,255,255), coul_bouton_clair=(170,170,170),police_nationale=pygame.font.SysFont('Corbel',35),
-        touches = [pygame.K_z, pygame.K_q, pygame.K_s, pygame.K_d],debug=False):
+        touches = [pygame.K_z, pygame.K_q, pygame.K_s, pygame.K_d],debug=False, ):
     """ boucle principale du jeu. Prend en argument les paramètre graphiques du style"""
     print("lancement d'une partie'")
     # menu principal
@@ -135,18 +135,23 @@ def partie(taille_laby=(10,10),mode_de_jeu="solo",
         duree_totale += Horloge.get_time()
 
     if not Defaite:
-        affiche_fenetre_victoire(duree_totale/1000)
+        affiche_fenetre_fin(duree_totale/1000,victoire=True)
+    else:
+        affiche_fenetre_fin(duree_totale/1000,victoire=True)
     pygame.display.quit()
 
 
-def affiche_fenetre_victoire(nb_ticks):
+def affiche_fenetre_fin(nb_ticks,victoire=True):
     pygame.init() 
     res = (620,220) # taille en pixels de la fenetre
     fenetre = pygame.display.set_mode(res)
-    police_nationale = pygame.font.SysFont('Corbel',res[1]//10) 
-    texte_victoire = police_nationale.render("Vous avez gagné en "+str(nb_ticks)+" secondes !" , True , (0,0,0))
+    police_nationale = pygame.font.SysFont('Corbel',res[1]//10)
+    if victoire:
+        texte_fin = police_nationale.render("Vous avez gagné en "+str(nb_ticks)+" secondes !" , True , (0,0,0))
+    else:
+        texte_fin = police_nationale.render("Vous avez perdu après "+str(nb_ticks)+" secondes !" , True , (0,0,0))
     fenetre.fill((255, 255,255))
-    fenetre.blit(texte_victoire, (res[0]//10, res[1]//2 - res[1]//10))
+    fenetre.blit(texte_fin, (res[0]//10, res[1]//2 - res[1]//10))
     pygame.display.update()
     attente = True
     while attente:
