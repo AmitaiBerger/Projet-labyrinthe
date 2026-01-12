@@ -35,17 +35,12 @@ class Joueur:
         if touches!=None:
             for i in range(4):
                 if key == touches[i]:
-                    self._direction=i
-
-
-                
+                    self._direction=i            
 
     def get_case_absolue(self):
         """renvoie l'indice de la case"""
         return self._case.i
-
-
-                    
+                   
     def deplacement(self):
         """
         Dans le cas où le joueur a cliqué sur une flèche du clavier, 
@@ -65,8 +60,7 @@ class Joueur:
                     self._case = self.labyrinthe.cases[self._case.i-1]
                 case 3:
                     self._case = self.labyrinthe.cases[self._case.i+self.labyrinthe.largeur]
-
-                    
+                 
     def voir(self):
         """Maj le visu_actuel et les cases_vues"""
         self.visu_actuel = set()

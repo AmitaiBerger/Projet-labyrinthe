@@ -75,9 +75,24 @@ def afficher_joueur(fond,joueur,taille_laby,camera=None,coul_partic=None):
         x_centre_case = (joueur.get_case_absolue() % joueur.labyrinthe.largeur + 0.5) * taille_case
         y_centre_case = (joueur.get_case_absolue() // joueur.labyrinthe.largeur + 0.5) * taille_case
         pygame.draw.circle(fond,(joueur._color if coul_partic==None else coul_partic),(x_centre_case,y_centre_case),taille_case/4)
-    elif isinstance(camera.centrage,Joueur.Joueur):
+    elif isinstance(camera.centrage,Joueur.Joueur) and camera.centrage==joueur:
         taille_case = taille_laby/camera.largeur_vision
         pygame.draw.circle(fond,(joueur._color if coul_partic==None else coul_partic),(taille_laby/2,taille_laby/2),taille_case/4)
+    elif isinstance(camera.centrage,Joueur.Joueur):
+        taille_case = taille_laby/camera.largeur_vision
+        case_centre = camera.centrage.get_case_absolue()
+        
+        x_centre_case = (joueur.get_case_absolue() % joueur.labyrinthe.largeur - (case_centre % joueur.labyrinthe.largeur)
+                          + camera.largeur_vision/2) * taille_case
+        y_centre_case = (joueur.get_case_absolue() // joueur.labyrinthe.largeur - (case_centre // joueur.labyrinthe.largeur)
+                          + camera.hauteur_vision/2) * taille_case
+        
+        if(x_centre_case>=-taille_case/2 and x_centre_case<=taille_laby+taille_case/2
+           and y_centre_case>=-taille_case/2 and y_centre_case<=taille_laby+taille_case/2):
+            #print("case centre=",case_centre)
+            #print("case i=",joueur.get_case_absolue())
+            #print("x_centre =",x_centre_case/taille_case," y_centre =",y_centre_case/taille_case)
+            pygame.draw.circle(fond,(joueur._color if coul_partic==None else coul_partic),(x_centre_case,y_centre_case),taille_case/4)
     else:
         print("camera.centrage=",camera.centrage)
         raise ValueError("type de centrage inconnu pour l'affichage du joueur")

@@ -41,10 +41,10 @@ def partie(taille_laby=(10,10),mode_de_jeu="solo",
 
     if mode_de_jeu=="robot":
         Labyr.placer_deux_joueurs(ratio_eloignement=0.6)
-        J1 = Joueur.Joueur(Labyr,Labyr.cases[Labyr.depart],(255,0,0),4,5)
+        J1 = Joueur.Joueur(Labyr,Labyr.cases[Labyr.joueur1],(255,0,0),4,5)
         J1.voir()
         joueurs.append(J1)
-        BOT = Joueur.Joueur(Labyr,Labyr.cases[0],(0,0,255),4,5)
+        BOT = Joueur.Joueur(Labyr,Labyr.cases[Labyr.joueur2],(0,0,255),4,5)
         BOT.voir()
         joueurs.append(BOT)
     
@@ -107,7 +107,8 @@ def partie(taille_laby=(10,10),mode_de_jeu="solo",
 
 
         # dessin du joueur en position absolue (en la couleur du joueur)
-        Affichage.afficher_joueur(fenetre,J1,min(res[0],res[1]),camera=type_vision)
+        for joueur in joueurs:
+            Affichage.afficher_joueur(fenetre,joueur,min(res[0],res[1]),camera=type_vision)
         
                     
         #pygame.display.flip()
