@@ -573,6 +573,69 @@ class Labyrinthe():
         print(f"J1={self.joueur1} (Dist Sortie: {dists_sortie[self.joueur1]})")
         print(f"J2={self.joueur2} (Dist Sortie: {dists_sortie[self.joueur2]}, Dist J1: {dists_j1[self.joueur2]})")
 
+    def placer_n_joueurs(self, n: int = 2, ratio_eloignement: float = 0.6):
+        """
+        Place n joueurs.
+        Le 1er est loin de la sortie.
+        Les suivants sont loin de la sortie ET loin des autres joueurs déjà placés.
+        """
+        import random
+
+        if not hasattr(self, 'sortie'):
+            print("Erreur : La sortie doit être définie avant.")
+            return
+
+        self.joueurs_indices = [] # Liste pour stocker les positions de départ [id0, id1, id2...]
+
+        # Carte des distances depuis la Sortie
+        dists_sortie = self._calculer_toutes_distances(self.sortie)
+        max_dist_sortie = max(dists_sortie.values())
+        seuil_sortie = int(max_dist_sortie * ratio_eloignement)
+
+        # --- PLACEMENT DES JOUEURS ---
+        for i in range(n):
+            candidats = []
+            
+            # On cherche les cases valides
+            for case_idx, dist_s in dists_sortie.items():
+                if dist_s < seuil_sortie: continue # Trop près de la sortie
+                if case_idx in self.joueurs_indices: continue # Case déjà prise
+                
+                # Si c'est le 2eme+ joueur, on vérifie la distance avec les copains
+                dist_min_autres = float('inf')
+                if i > 0:
+                    for j_idx in self.joueurs_indices:
+                        d = self._calculer_toutes_distances(j_idx)[case_idx]
+                        if d < dist_min_autres: dist_min_autres = d
+                    
+                    # Score : on veut maximiser la distance au plus proche voisin
+                    # tout en étant loin de la sortie.
+                    candidats.append((case_idx, dist_min_autres))
+                else:
+                    # Pour le premier, seul la distance sortie compte (déjà filtré)
+                    candidats.append((case_idx, 0))
+
+            # Choix du meilleur candidat
+            if not candidats:
+                # Fallback : une case libre au pif
+                possibles = [k for k in range(len(self.cases)) if k not in self.joueurs_indices and k != self.sortie]
+                choix = random.choice(possibles)
+            else:
+                # On prend celui qui est le plus loin des autres (MaxMin)
+                # Astuce : on trie par distance décroissante et on prend un des meilleurs
+                candidats.sort(key=lambda x: x[1], reverse=True)
+                # On prend au hasard parmi les top 10% pour varier
+                top_k = max(1, len(candidats)//5)
+                choix = random.choice(candidats[:top_k])[0]
+
+            self.joueurs_indices.append(choix)
+
+        # Pour compatibilité avec le vieux code (si besoin)
+        self.joueur1 = self.joueurs_indices[0]
+        if n > 1: self.joueur2 = self.joueurs_indices[1]
+        
+        print(f"Joueurs placés : {self.joueurs_indices}")
+
 
 
 
