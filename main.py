@@ -44,7 +44,7 @@ def partie(taille_laby=(10,10),mode_de_jeu="solo",
         J1 = Joueur.Joueur(Labyr,Labyr.cases[Labyr.joueur1],(255,0,0),4,5)
         J1.voir()
         joueurs.append(J1)
-        BOT = Joueur.Joueur(Labyr,Labyr.cases[Labyr.joueur2],(0,0,255),4,5)
+        BOT = Joueur.Joueur(Labyr,Labyr.cases[Labyr.joueur2],(0,0,255),4,5,reflection="explorateur")
         BOT.voir()
         joueurs.append(BOT)
     
@@ -92,15 +92,11 @@ def partie(taille_laby=(10,10),mode_de_jeu="solo",
                 if len(joueurs)>1:
                     # déplacement du robot
                     Affichage.effacer_joueur(fenetre,BOT,min(res[0],res[1]),camera=type_vision)
-                    # stratégie très basique : le robot choisit une direction au hasard parmi celles possibles
-                    directions_possibles = []
-                    for d in range(4):
-                        if BOT._case.voisins[d]:
-                            directions_possibles.append(d)
-                    if len(directions_possibles)>0:
-                        BOT._direction = random.choice(directions_possibles)
-                        BOT.deplacement()
-                        BOT.voir()
+                    
+                    
+                    BOT._direction = BOT.choisir_case()
+                    BOT.deplacement()
+                    BOT.voir()
                     
                     if(BOT.get_case_absolue() == Labyr.sortie):
                         print("Le robot a gagné ! Vous avez perdu.")
