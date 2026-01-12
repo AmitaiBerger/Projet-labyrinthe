@@ -4,7 +4,8 @@ import pickle
 from Laby import Labyrinthe # Le serveur doit connaitre la classe
 
 # Configuration
-server = "localhost" # Ou "0.0.0.0" pour écouter sur tout le réseau local
+#server = "localhost"
+server = "0.0.0.0" # Ou "0.0.0.0" pour écouter sur tout le réseau local
 port = 5555
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
