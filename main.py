@@ -13,24 +13,22 @@ pygame.init()
 def partie(taille_laby=(10,10), mode_de_jeu="solo", ip_serveur="localhost",
         coul_fond=(255,255,255), coul_bouton_clair=(170,170,170),police_nationale=pygame.font.SysFont('Corbel',35),
         touches = [pygame.K_z, pygame.K_q, pygame.K_s, pygame.K_d], debug=False):
-    """ boucle principale du jeu. Prend en argument les paramètre graphiques du style"""
-    print(f"lancement d'une partie en mode {mode_de_jeu}")
     
+    print(f"lancement d'une partie en mode {mode_de_jeu}")
     pygame.init() 
-    res = (720,720) # taille en pixels de la fenetre
+    res = (720,720)
     fenetre = pygame.display.set_mode(res)
     pygame.display.set_caption("Jeu de labyrinthe")
     Horloge = pygame.time.Clock()
     fps_max = 60
 
     joueurs = []
-    mon_id = 0 # Par défaut 0 en solo
-    reseau = None # Objet network
-
-    # --- INITIALISATION SELON LE MODE ---
+    mon_id = 0
+    reseau = None
+    
+    # --- CONFIGURATION INITIALE ---
     if mode_de_jeu == "reseau":
-        print("Connexion au serveur...")
-        # Affichage d'un écran de chargement basique
+        # Ecran de chargement
         fenetre.fill((255,255,255))
         txt = police_nationale.render("Connexion au serveur...", True, (0,0,0))
         fenetre.blit(txt, (res[0]//2 - txt.get_width()//2, res[1]//2))
@@ -38,56 +36,44 @@ def partie(taille_laby=(10,10), mode_de_jeu="solo", ip_serveur="localhost",
 
         reseau = Network(ip_serveur)
         if reseau.p is None:
-            print("Impossible de se connecter au serveur")
-            return # Retour au menu
+            return # Echec connexion
 
-        # Le serveur envoie (Labyrinthe, mon_id)
         Labyr, mon_id = reseau.p
-        Labyr.visibles() # Recalculer les visions (pas toujours conservé par pickle parfaitement)
+        Labyr.visibles()
         
-        # Configuration des joueurs
-        # Si je suis 0 (Rouge), l'adversaire est 1 (Bleu)
-        # Si je suis 1 (Bleu), l'adversaire est 0 (Rouge)
-        
-        # Joueur 1 (Rouge)
+        # Création des joueurs
         J1_obj = Joueur.Joueur(Labyr, Labyr.cases[Labyr.joueur1], (255,0,0), 4, 5)
-        # Joueur 2 (Bleu)
         J2_obj = Joueur.Joueur(Labyr, Labyr.cases[Labyr.joueur2], (0,0,255), 4, 5)
         
         if mon_id == 0:
             J_Moi = J1_obj
             J_Autre = J2_obj
-            print("Je suis le joueur 1 (Rouge)")
+            coul_moi = (255, 0, 0)
         else:
             J_Moi = J2_obj
             J_Autre = J1_obj
-            print("Je suis le joueur 2 (Bleu)")
+            coul_moi = (0, 0, 255)
 
         joueurs.append(J_Moi)
         joueurs.append(J_Autre)
-        J_Moi.voir() # Calcul de la vision initiale
-
-        # On utilise les dimensions du laby reçu
+        J_Moi.voir()
+        
         largeur = Labyr.largeur
         hauteur = Labyr.hauteur
 
     else:
-        # MODE SOLO OU ROBOT LOCAL
+        # Code existant pour SOLO / ROBOT
         largeur = taille_laby[1]
         hauteur = taille_laby[0]
         Labyr = Labyrinthe(largeur,hauteur)
         Labyr.generer_par_Wilson()
-        if debug:
-            Labyr.afficher_comme_texte()
         Labyr.visibles()
-
         if mode_de_jeu=="solo":
             Labyr.placer_depart(ratio_distance_min=0.7)
             J1 = Joueur.Joueur(Labyr,Labyr.cases[Labyr.depart],(255,0,0),4,5)
             J1.voir()
             joueurs.append(J1)
-            J_Moi = J1 # Pointeur pour faciliter le code commun
-        
+            J_Moi = J1
         if mode_de_jeu=="robot":
             Labyr.placer_deux_joueurs(ratio_eloignement=0.6)
             J1 = Joueur.Joueur(Labyr,Labyr.cases[Labyr.joueur1],(255,0,0),4,5)
@@ -99,88 +85,109 @@ def partie(taille_laby=(10,10), mode_de_jeu="solo", ip_serveur="localhost",
 
     # --- CAMÉRA ---
     type_vision = Camera()
-    type_vision.centrage = joueurs[0] # On centre toujours sur soi (joueur à l'index 0 si solo, ou J_Moi en reseau)
+    type_vision.centrage = J_Moi
+    
     if mode_de_jeu == "reseau":
-        type_vision.centrage = J_Moi
-
-    dimension_min_laby = min(hauteur, largeur)
-    # Ajustement zoom selon taille
-    if mode_de_jeu == "reseau":
-        type_vision.hauteur_vision = 10 # Zoom fixe pour le réseau
-        type_vision.largeur_vision = 10
+        type_vision.hauteur_vision = 12
+        type_vision.largeur_vision = 12
     else:
-        type_vision.hauteur_vision = dimension_min_laby
-        type_vision.largeur_vision = dimension_min_laby
+        type_vision.hauteur_vision = min(hauteur, largeur)
+        type_vision.largeur_vision = min(hauteur, largeur)
 
-    fenetre.fill((255, 255,255))
-    pygame.display.update()
-
-    # boucle principale :
+    # BOUCLE PRINCIPALE
     Sortie = False
     Defaite = False
+    GameStatus = "PLAY" # Par défaut PLAY pour le solo
     duree_totale = 0
-
-    print("lancement de la boucle principale")
+    message_attente = "En attente du joueur 2..."
 
     while not Sortie:
-        # Gestion Réseau : Envoi/Réception
+        # 1. GESTION RÉSEAU
+        can_move = True
+        
         if mode_de_jeu == "reseau":
-            # J'envoie ma position, je reçois celle de l'autre
             try:
-                pos_autre_idx = reseau.send(J_Moi.get_case_absolue())
-                if pos_autre_idx is not None:
-                    J_Autre.set_case_absolue(pos_autre_idx)
+                # Envoi position -> Réception (Pos_Autre, Status)
+                reponse = reseau.send(J_Moi.get_case_absolue())
+                
+                if reponse:
+                    pos_autre, GameStatus = reponse
+                    J_Autre.set_case_absolue(pos_autre)
+                    
+                    if GameStatus == "WAIT":
+                        can_move = False
+                    elif GameStatus == "WIN":
+                        # J'ai gagné (le serveur confirme)
+                        Sortie = True
+                        Defaite = False
+                    elif GameStatus == "LOSE":
+                        # L'autre a gagné
+                        Sortie = True
+                        Defaite = True
+                        
             except Exception as e:
                 print("Erreur réseau:", e)
                 Sortie = True
 
-        if(pygame.time.get_ticks()>300000): # Augmenté à 5 min
-            Sortie = True
-            print("sortie car temps trop long")
-
+        # 2. EVENTS
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 Sortie = True
-                Defaite = True
-            if event.type == pygame.KEYDOWN:
+                Defaite = True # Quitter = perdre/abandonner
+            
+            if event.type == pygame.KEYDOWN and can_move:
                 Affichage.effacer_joueur(fenetre, J_Moi, min(res[0],res[1]), camera=type_vision)
                 J_Moi.changement_direction(event.key, touches)
                 J_Moi.deplacement()
                 J_Moi.voir()
 
-                if(J_Moi.get_case_absolue() == Labyr.sortie):
-                    print("Vous avez gagné !")
+                # Victoire Solo / Robot (Gestion locale)
+                if mode_de_jeu != "reseau" and J_Moi.get_case_absolue() == Labyr.sortie:
                     Sortie = True
-                
-                # Vérifier si l'autre a gagné (en mode réseau)
-                if mode_de_jeu == "reseau" and J_Autre.get_case_absolue() == Labyr.sortie:
-                    print("L'adversaire a gagné !")
-                    Sortie = True
-                    Defaite = True
+                    Defaite = False
 
-        # dessin éléments :
+        # 3. AFFICHAGE
         Affichage.tout_effacer(fenetre)
 
-        # En mode réseau, on voit tout ou juste ce qu'on explore ? 
-        # Gardons le brouillard de guerre :
-        Affichage.affiche_ensemble_de_cases(fenetre,Labyr,J_Moi.cases_vues,min(res[0],res[1]),coul_mur=(150,150,150),camera=type_vision)
-        Affichage.affiche_ensemble_de_cases(fenetre,Labyr,J_Moi.visu_actuel,min(res[0],res[1]),coul_mur=(0,0,0),camera=type_vision)
+        if mode_de_jeu == "reseau" and not can_move:
+            # Écran d'attente
+            police_attente = pygame.font.SysFont('Corbel', 50)
+            txt = police_attente.render(message_attente, True, (0,0,0))
+            fenetre.blit(txt, (res[0]//2 - txt.get_width()//2, res[1]//2))
+        else:
+            # Jeu normal
+            Affichage.affiche_ensemble_de_cases(fenetre,Labyr,J_Moi.cases_vues,min(res[0],res[1]),coul_mur=(150,150,150),camera=type_vision)
+            Affichage.affiche_ensemble_de_cases(fenetre,Labyr,J_Moi.visu_actuel,min(res[0],res[1]),coul_mur=(0,0,0),camera=type_vision)
+            
+            for joueur in joueurs:
+                Affichage.afficher_joueur(fenetre,joueur,min(res[0],res[1]),camera=type_vision)
 
-        # dessin des joueurs
-        for joueur in joueurs:
-            # On n'affiche l'adversaire que s'il est dans nos cases vues (optionnel, ici on l'affiche toujours pour tester)
-            # Pour faire réaliste : if joueur == J_Moi or joueur.get_case_absolue() in J_Moi.visu_actuel:
-            Affichage.afficher_joueur(fenetre,joueur,min(res[0],res[1]),camera=type_vision)
-        
         pygame.display.update()
         Horloge.tick(fps_max)
-        duree_totale += Horloge.get_time()
+        if can_move:
+            duree_totale += Horloge.get_time()
 
+    # FIN DE PARTIE
+    if mode_de_jeu == "reseau":
+        reseau.close() # Important : on coupe la connexion pour que le serveur reset
+    
     if not Defaite:
         affiche_fenetre_victoire(duree_totale/1000)
-    
-    # Pas de quit ici pour revenir au menu, sauf si on ferme la fenetre
-    # pygame.display.quit()
+    elif mode_de_jeu == "reseau":
+        # Petit écran de défaite rapide
+        affiche_fenetre_defaite()
+        
+    # Retour au menu (pygame.display.quit n'est pas appelé ici pour garder le menu actif)
+
+def affiche_fenetre_defaite():
+    res = (620,220) 
+    fenetre = pygame.display.set_mode(res)
+    police = pygame.font.SysFont('Corbel',res[1]//10) 
+    texte = police.render("Perdu ! L'adversaire a gagné.", True , (200,0,0))
+    fenetre.fill((255, 255,255))
+    fenetre.blit(texte, (res[0]//10, res[1]//2 - res[1]//10))
+    pygame.display.update()
+    pygame.time.delay(3000) # Attendre 3 secondes puis quitter
 
 def affiche_fenetre_victoire(nb_ticks):
     # pygame.init() # Déjà init

@@ -7,13 +7,11 @@ class Network:
         self.server = ip
         self.port = 5555
         self.addr = (self.server, self.port)
-        # Lors de la connexion, on récupère un tuple : (Labyrinthe, id_joueur)
         self.p = self.connect()
 
     def connect(self):
         try:
             self.client.connect(self.addr)
-            # On augmente la taille du buffer car le Labyrinthe est un gros objet
             return pickle.loads(self.client.recv(4096*16))
         except socket.error as e:
             print("Erreur de connexion :", e)
@@ -21,7 +19,8 @@ class Network:
 
     def send(self, data):
         """
-        Envoie sa position (int) et reçoit celle de l'adversaire (int)
+        Envoie sa position (int) 
+        Reçoit (pos_adversaire, status)
         """
         try:
             self.client.send(pickle.dumps(data))
@@ -29,3 +28,6 @@ class Network:
         except socket.error as e:
             print(e)
             return None
+    
+    def close(self):
+        self.client.close()
