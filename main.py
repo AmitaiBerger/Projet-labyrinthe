@@ -133,7 +133,7 @@ def partie(taille_laby=(10,10),mode_de_jeu="solo",
     if not Defaite:
         affiche_fenetre_fin(duree_totale/1000,victoire=True)
     else:
-        affiche_fenetre_fin(duree_totale/1000,victoire=True)
+        affiche_fenetre_fin(duree_totale/1000,victoire=False)
     pygame.display.quit()
 
 
