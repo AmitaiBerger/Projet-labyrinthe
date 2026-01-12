@@ -19,7 +19,7 @@ class Type_Joueur(Enum):
 
 @dataclass
 class Parametres:
-    joueurs:list[Union[Type_Joueur,tuple(Type_Joueur, float)]]#=[Type_Joueur.HUMAIN]
+    joueurs:list[Union[Type_Joueur,tuple[Type_Joueur, float]]]#=[Type_Joueur.HUMAIN]
     touches:list[type(pygame.K_z)]# = [pygame.K_RIGHT,pygame.K_UP,pygame.K_LEFT,pygame.K_DOWN]
 
     #param graphiques
@@ -57,7 +57,11 @@ def partie(params:Parametres=Parametres(joueurs=[Type_Joueur.HUMAIN],touches=[py
     joueurs = []
 
     for joueur_type in params.joueurs:
-        typ = joueur_type if isinstance(joueur_type,Type_Joueur) else typ = joueur_type[0]
+
+        if isinstance(joueur_type,Type_Joueur) :
+            typ = joueur_type  
+        else:
+            typ = joueur_type[0]
         match typ:
             case Type_Joueur.HUMAIN:
                 if mode_de_jeu=="solo":
@@ -73,24 +77,18 @@ def partie(params:Parametres=Parametres(joueurs=[Type_Joueur.HUMAIN],touches=[py
                 # mode_de_jeu = robot par défaut
                 BOT = Joueur.Joueur(Labyr,Labyr.cases[Labyr.joueur2],(0,0,255),4,5,reflection="aleatoire")
                 BOT.voir()
+                if not isinstance(joueur_type,Type_Joueur):
+                    BOT.asynchrone = True
+                    BOT.moment_dernier_mvt = 0
+                    BOT.mvt_par_sec = joueur_type[1]
                 joueurs.append(BOT)
             case Type_Joueur.ROBOT_EXPLORATEUR:
                 BOT = Joueur.Joueur(Labyr,Labyr.cases[Labyr.joueur2],(0,0,255),4,5,reflection="explorateur")
                 BOT.voir()
-                joueurs.append(BOT)
-            case Type_Joueur.ROBOT_ALEATOIRE_ASYNC:
-                BOT = Joueur.Joueur(Labyr,Labyr.cases[Labyr.joueur2],(0,0,255),4,5,reflection="aleatoire",vitesse=joueur_type[1])
-                BOT.voir()
-                BOT.asynchrone = True
-                BOT.moment_dernier_mvt = 0
-                BOT.mvt_par_sec = joueur_type[1]
-                joueurs.append(BOT)
-            case Type_Joueur.ROBOT_EXPLORATEUR_ASYNC:
-                BOT = Joueur.Joueur(Labyr,Labyr.cases[Labyr.joueur2],(0,0,255),4,5,reflection="aleatoire",vitesse=joueur_type[1])
-                BOT.voir()
-                BOT.asynchrone = True
-                BOT.moment_dernier_mvt = 0
-                BOT.mvt_par_sec = joueur_type[1]
+                if not isinstance(joueur_type,Type_Joueur):
+                    BOT.asynchrone = True
+                    BOT.moment_dernier_mvt = 0
+                    BOT.mvt_par_sec = joueur_type[1]
                 joueurs.append(BOT)
     J1 = joueurs[0]
     type_vision = Camera()
@@ -135,17 +133,19 @@ def partie(params:Parametres=Parametres(joueurs=[Type_Joueur.HUMAIN],touches=[py
                     Sortie = True
                 
                 if len(joueurs)>1:
-                    # déplacement du robot
-                    Affichage.effacer_joueur(fenetre,BOT,min(res[0],res[1]),camera=type_vision)
-                    
-                    
-                    BOT.se_mouvoir()
-                    BOT.voir()
-                    
-                    if(BOT.get_case_absolue() == Labyr.sortie):
-                        print("Le robot a gagné ! Vous avez perdu.")
-                        Sortie = True
-                        Defaite = True
+                    for i in range(1,len(joueurs)):
+                        if not(joueurs[i].asynchrone):
+                            # déplacement du robot
+                            Affichage.effacer_joueur(fenetre,joueurs[i],min(res[0],res[1]),camera=type_vision)
+                            
+                            
+                            joueurs[i].se_mouvoir()
+                            joueurs[i].voir()
+                            
+                            if(joueurs[i].get_case_absolue() == Labyr.sortie):
+                                print("Le robot a gagné ! Vous avez perdu.")
+                                Sortie = True
+                                Defaite = True
 
         for joueur in joueurs:
             if joueur.asynchrone:
@@ -325,9 +325,14 @@ if __name__=="__main__":
                 or (event.type==pygame.KEYDOWN 
                     and (event.key == pygame.K_RETURN or event.key == pygame.K_s
                          or event.key == pygame.K_r))):
-                    modeDeJeu = "solo" if ((event.type == pygame.MOUSEBUTTONUP and rect_click.collidepoint(pygame.mouse.get_pos())) 
+                    if ((event.type == pygame.MOUSEBUTTONUP and rect_click.collidepoint(pygame.mouse.get_pos())) 
                        or (event.type==pygame.KEYDOWN 
-                    and (event.key == pygame.K_RETURN or event.key == pygame.K_s))) else "robot"
+                    and (event.key == pygame.K_RETURN or event.key == pygame.K_s))):
+                        modeDeJeu = "solo" 
+                        j = [Type_Joueur.HUMAIN]
+                    else: 
+                        modeDeJeu = "robot"
+                        j = [Type_Joueur.HUMAIN,(Type_Joueur.ROBOT_EXPLORATEUR,2.0)]
                     pygame.display.quit()
                     hauteur_defaut = 10
                     largeur_defaut = 10
@@ -339,7 +344,7 @@ if __name__=="__main__":
                     if hauteur_entree == "":
                         hauteur_entree = hauteur_defaut
                     
-                    partie(Parametres(joueurs=[Type_Joueur.HUMAIN],touches=[pygame.K_RIGHT,pygame.K_UP,pygame.K_LEFT,pygame.K_DOWN]),(int(largeur_entree),int(hauteur_entree)),mode_de_jeu=modeDeJeu)
+                    partie(Parametres(joueurs=j,touches=[pygame.K_RIGHT,pygame.K_UP,pygame.K_LEFT,pygame.K_DOWN]),(int(largeur_entree),int(hauteur_entree)),mode_de_jeu=modeDeJeu)
                     pygame.quit()
                     sys.exit()
 

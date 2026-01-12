@@ -23,6 +23,11 @@ class Joueur:
         self.asynchrone = False # indique si le joueur est asynchrone (utile pour les robots)
         if(self.reflexion == "explorateur"):
             self.taux_exploration_cases = {}# dictionnaire qui quantifie le taux d'exploration de chaque case
+        if not self.reflection=="humain":
+            self.voit_culs_de_sac = True
+            self.culs_de_sac = set() # ensemble des indices de cases qui sont des culs de sac
+        else:
+            self.voit_culs_de_sac = False
     def changement_direction(self,key,touches=None) -> None:
         """
         Met à jour la direction uniquement lors d'un nouvel appui sur une touche.
