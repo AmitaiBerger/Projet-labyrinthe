@@ -14,13 +14,14 @@ class Type_Joueur(Enum):
     HUMAIN = 1
     ROBOT_ALEATOIRE = 2
     ROBOT_EXPLORATEUR =3
-    ROBOT_ALEATOIRE_ASYNC = 4
-    ROBOT_EXPLORATEUR_ASYNC = 5
+    #ROBOT_ALEATOIRE_ASYNC = 4
+    #ROBOT_EXPLORATEUR_ASYNC = 5
+
 
 @dataclass
 class Parametres:
-    joueurs:list[Type_Joueur]=[Type_Joueur.HUMAIN]
-    touches:list[type(pygame.K_z)] = [pygame.K_RIGHT,pygame.K_UP,pygame.K_LEFT,pygame.K_DOWN]
+    joueurs:list[Type_Joueur]#=[Type_Joueur.HUMAIN]
+    touches:list[type(pygame.K_z)]# = [pygame.K_RIGHT,pygame.K_UP,pygame.K_LEFT,pygame.K_DOWN]
 
     #param graphiques
     coul_fond:tuple[int,int,int]=(255,255,255)
@@ -28,7 +29,7 @@ class Parametres:
     police_nationale:type(pygame.font.SysFont)=pygame.font.SysFont('Corbel',35)
     debug:bool=False
 
-def partie(params:Parametres=Parametres(),taille_laby=(10,10),mode_de_jeu="solo",
+def partie(params:Parametres=Parametres(joueurs=[Type_Joueur.HUMAIN],touches=[pygame.K_RIGHT,pygame.K_UP,pygame.K_LEFT,pygame.K_DOWN]),taille_laby=(10,10),mode_de_jeu="solo",
         ):
     """ boucle principale du jeu. Prend en argument les paramètre graphiques du style"""
     print("lancement d'une partie'")
@@ -45,7 +46,7 @@ def partie(params:Parametres=Parametres(),taille_laby=(10,10),mode_de_jeu="solo"
 
     Labyr = Labyrinthe(largeur,hauteur)
     Labyr.generer_par_Wilson()
-    if debug:
+    if params.debug:
         Labyr.afficher_comme_texte()
     Labyr.visibles()
 
@@ -306,7 +307,7 @@ if __name__=="__main__":
                     if hauteur_entree == "":
                         hauteur_entree = hauteur_defaut
                     
-                    partie((int(largeur_entree),int(hauteur_entree)),mode_de_jeu=modeDeJeu)
+                    partie(Parametres(joueurs=[Type_Joueur.HUMAIN],touches=[pygame.K_RIGHT,pygame.K_UP,pygame.K_LEFT,pygame.K_DOWN]),(int(largeur_entree),int(hauteur_entree)),mode_de_jeu=modeDeJeu)
                     pygame.quit()
                     sys.exit()
 
