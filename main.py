@@ -232,6 +232,9 @@ if __name__=="__main__":
                 or (event.type==pygame.KEYDOWN 
                     and (event.key == pygame.K_RETURN or event.key == pygame.K_s
                          or event.key == pygame.K_r))):
+                    modeDeJeu = "solo" if ((event.type == pygame.MOUSEBUTTONUP and rect_click.collidepoint(pygame.mouse.get_pos())) 
+                       or (event.type==pygame.KEYDOWN 
+                    and (event.key == pygame.K_RETURN or event.key == pygame.K_s))) else "robot"
                     pygame.display.quit()
                     hauteur_defaut = 10
                     largeur_defaut = 10
@@ -243,12 +246,7 @@ if __name__=="__main__":
                     if hauteur_entree == "":
                         hauteur_entree = hauteur_defaut
                     
-                    if((event.type == pygame.MOUSEBUTTONUP and rect_click.collidepoint(pygame.mouse.get_pos())) 
-                       or (event.type==pygame.KEYDOWN 
-                    and (event.key == pygame.K_RETURN or event.key == pygame.K_s))):
-                        partie((int(largeur_entree),int(hauteur_entree)),mode_de_jeu="solo")
-                    else:
-                        partie((int(largeur_entree),int(hauteur_entree)),mode_de_jeu="robot")
+                    partie((int(largeur_entree),int(hauteur_entree)),mode_de_jeu=modeDeJeu)
                     pygame.quit()
                     sys.exit()
 
