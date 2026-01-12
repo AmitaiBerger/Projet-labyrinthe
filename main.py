@@ -25,18 +25,28 @@ def partie(taille_laby=(10,10),mode_de_jeu="solo",
 
     Labyr = Labyrinthe(largeur,hauteur)
     Labyr.generer_par_Wilson()
-    Labyr.placer_depart(ratio_distance_min=0.7)
     if debug:
         Labyr.afficher_comme_texte()
     Labyr.visibles()
 
-    # création du Joueur :
-    J1 = Joueur.Joueur(Labyr,Labyr.cases[0],(255,0,0),4,5)
-    J1.voir()
+    joueurs = []
+
+    if mode_de_jeu=="solo":
+        Labyr.placer_depart(ratio_distance_min=0.7)
+        # création du Joueur :
+        J1 = Joueur.Joueur(Labyr,Labyr.cases[Labyr.depart],(255,0,0),4,5)
+        J1.voir()
+        joueurs.append(J1)
+    
 
     if mode_de_jeu=="robot":
+        Labyr.placer_deux_joueurs(ratio_eloignement=0.6)
+        J1 = Joueur.Joueur(Labyr,Labyr.cases[Labyr.depart],(255,0,0),4,5)
+        J1.voir()
+        joueurs.append(J1)
         BOT = Joueur.Joueur(Labyr,Labyr.cases[0],(0,0,255),4,5)
         BOT.voir()
+        joueurs.append(BOT)
     
 
     type_vision = Camera()

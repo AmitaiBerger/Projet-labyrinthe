@@ -87,7 +87,6 @@ class Labyrinthe():
         ligne_bas += "+"
         print(ligne_bas)
 
-    
     def directions_voisines(self,indice_centre:int):
         """renvoie la liste directions possibles à partir d'une case donnée
         sous forme d'un entier (une direction impossible est un coté extérieur du labyrinthe)
@@ -147,7 +146,6 @@ class Labyrinthe():
             return 3
         else:
             return None
-
 
     def generer_par_Wilson(self):
         """crée un labyrinthe avec l'algorithme de Wilson.
