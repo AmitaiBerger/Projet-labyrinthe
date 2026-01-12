@@ -21,7 +21,7 @@ def partie(taille_laby=(10,10),mode_de_jeu="solo",
     largeur = taille_laby[1]
     hauteur = taille_laby[0]
     Horloge = pygame.time.Clock()
-    fps_max = 60# fps_max
+    fps_max = 5 # fps_max
 
     Labyr = Labyrinthe(largeur,hauteur)
     Labyr.generer_par_Wilson()
@@ -82,27 +82,27 @@ def partie(taille_laby=(10,10),mode_de_jeu="solo",
                 #on efface la position précédente du joueur et on dessine la nouvelle position
                 Affichage.effacer_joueur(fenetre,J1,min(res[0],res[1]),camera=type_vision)
                 J1.changement_direction(event.key,touches)
-                J1.deplacement()
-                J1.voir()
+        J1.deplacement()
+        J1.voir()
 
-                if(J1.get_case_absolue() == Labyr.sortie):
-                    print("Vous avez gagné !")
-                    Defaiite = False
-                    Sortie = True
-                
-                if len(joueurs)>1:
-                    # déplacement du robot
-                    Affichage.effacer_joueur(fenetre,BOT,min(res[0],res[1]),camera=type_vision)
-                    
-                    
-                    BOT._direction = BOT.choisir_case()
-                    BOT.deplacement()
-                    BOT.voir()
-                    
-                    if(BOT.get_case_absolue() == Labyr.sortie):
-                        print("Le robot a gagné ! Vous avez perdu.")
-                        Sortie = True
-                        Defaite = True
+        if(J1.get_case_absolue() == Labyr.sortie):
+            print("Vous avez gagné !")
+            Defaiite = False
+            Sortie = True
+        
+        if len(joueurs)>1:
+            # déplacement du robot
+            Affichage.effacer_joueur(fenetre,BOT,min(res[0],res[1]),camera=type_vision)
+            
+            
+            BOT._direction = BOT.choisir_case()
+            BOT.deplacement()
+            BOT.voir()
+            
+            if(BOT.get_case_absolue() == Labyr.sortie):
+                print("Le robot a gagné ! Vous avez perdu.")
+                Sortie = True
+                Defaite = True
 
 
                     
