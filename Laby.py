@@ -569,6 +569,7 @@ class Labyrinthe():
             self.joueur2 = max(dists_j1, key=dists_j1.get)
 
         print(f"Placement : Sortie={self.sortie}")
+        self.cases[self.sortie].contenu="Sortie"
         print(f"J1={self.joueur1} (Dist Sortie: {dists_sortie[self.joueur1]})")
         print(f"J2={self.joueur2} (Dist Sortie: {dists_sortie[self.joueur2]}, Dist J1: {dists_j1[self.joueur2]})")
 
