@@ -88,6 +88,24 @@ def partie(taille_laby=(10,10),mode_de_jeu="solo",
                 if(J1.get_case_absolue() == Labyr.sortie):
                     print("Vous avez gagné !")
                     Sortie = True
+                
+                if len(joueurs)>1:
+                    # déplacement du robot
+                    Affichage.effacer_joueur(fenetre,BOT,min(res[0],res[1]),camera=type_vision)
+                    # stratégie très basique : le robot choisit une direction au hasard parmi celles possibles
+                    directions_possibles = []
+                    for d in range(4):
+                        if BOT._case.voisins[d]:
+                            directions_possibles.append(d)
+                    if len(directions_possibles)>0:
+                        BOT._direction = random.choice(directions_possibles)
+                        BOT.deplacement()
+                        BOT.voir()
+                    
+                    if(BOT.get_case_absolue() == Labyr.sortie):
+                        print("Le robot a gagné ! Vous avez perdu.")
+                        Sortie = True
+                        Defaite = True
 
 
                     
