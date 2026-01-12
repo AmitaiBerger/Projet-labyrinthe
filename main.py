@@ -7,12 +7,32 @@ import sys
 import pygame
 pygame.init()
 import Joueur
+from dataclasses import dataclass
+from enum import Enum
 
-def partie(taille_laby=(10,10),mode_de_jeu="solo",
-        coul_fond=(255,255,255), coul_bouton_clair=(170,170,170),police_nationale=pygame.font.SysFont('Corbel',35),
-        touches = [pygame.K_z, pygame.K_q, pygame.K_s, pygame.K_d],debug=False, ):
+class Type_Joueur(Enum):
+    HUMAIN = 1
+    ROBOT_ALEATOIRE = 2
+    ROBOT_EXPLORATEUR =3
+    ROBOT_ALEATOIRE_ASYNC = 4
+    ROBOT_EXPLORATEUR_ASYNC = 5
+
+@dataclass
+class Parametres:
+    joueurs:list[Type_Joueur]=[Type_Joueur.HUMAIN]
+    touches:list[type(pygame.K_z)] = [pygame.K_RIGHT,pygame.K_UP,pygame.K_LEFT,pygame.K_DOWN]
+
+    #param graphiques
+    coul_fond:tuple[int,int,int]=(255,255,255)
+    coul_bouton_clair:tuple[int,int,int]=(170,170,170)
+    police_nationale:type(pygame.font.SysFont)=pygame.font.SysFont('Corbel',35)
+    debug:bool=False
+
+def partie(params:Parametres=Parametres(),taille_laby=(10,10),mode_de_jeu="solo",
+        ):
     """ boucle principale du jeu. Prend en argument les paramètre graphiques du style"""
     print("lancement d'une partie'")
+    mode_de_jeu = "solo" if len(params.joueurs)==1 else "robot"
     # menu principal
     pygame.init() 
     res = (720,720) # taille en pixels de la fenetre
@@ -29,26 +49,35 @@ def partie(taille_laby=(10,10),mode_de_jeu="solo",
         Labyr.afficher_comme_texte()
     Labyr.visibles()
 
-    joueurs = []
-
     if mode_de_jeu=="solo":
         Labyr.placer_depart(ratio_distance_min=0.7)
-        # création du Joueur :
-        J1 = Joueur.Joueur(Labyr,Labyr.cases[Labyr.depart],(255,0,0),4,5)
-        J1.voir()
-        joueurs.append(J1)
-    
-
-    if mode_de_jeu=="robot":
+    elif mode_de_jeu=="robot":
         Labyr.placer_deux_joueurs(ratio_eloignement=0.6)
-        J1 = Joueur.Joueur(Labyr,Labyr.cases[Labyr.joueur1],(255,0,0),4,5)
-        J1.voir()
-        joueurs.append(J1)
-        BOT = Joueur.Joueur(Labyr,Labyr.cases[Labyr.joueur2],(0,0,255),4,5,reflection="explorateur")
-        BOT.voir()
-        joueurs.append(BOT)
-    
 
+    joueurs = []
+
+    for joueur_type in params.joueurs:
+        match joueur_type:
+            case Type_Joueur.HUMAIN:
+                if mode_de_jeu=="solo":
+                    # création du Joueur :
+                    J1 = Joueur.Joueur(Labyr,Labyr.cases[Labyr.depart],(255,0,0),4,5)
+                    J1.voir()
+                    joueurs.append(J1)
+                elif mode_de_jeu=="robot":
+                    J1 = Joueur.Joueur(Labyr,Labyr.cases[Labyr.joueur1],(255,0,0),4,5)
+                    J1.voir()
+                    joueurs.append(J1)
+            case Type_Joueur.ROBOT_ALEATOIRE:
+                # mode_de_jeu = robot par défaut
+                BOT = Joueur.Joueur(Labyr,Labyr.cases[Labyr.joueur2],(0,0,255),4,5,reflection="aleatoire")
+                BOT.voir()
+                joueurs.append(BOT)
+            case Type_Joueur.ROBOT_EXPLORATEUR:
+                BOT = Joueur.Joueur(Labyr,Labyr.cases[Labyr.joueur2],(0,0,255),4,5,reflection="explorateur")
+                BOT.voir()
+                joueurs.append(BOT)
+    J1 = joueurs[0]
     type_vision = Camera()
     type_vision.centrage=J1
     dimension_min_laby = min(taille_laby[0],taille_laby[1])
@@ -81,7 +110,7 @@ def partie(taille_laby=(10,10),mode_de_jeu="solo",
             if event.type == pygame.KEYDOWN:
                 #on efface la position précédente du joueur et on dessine la nouvelle position
                 Affichage.effacer_joueur(fenetre,J1,min(res[0],res[1]),camera=type_vision)
-                J1.changement_direction(event.key,touches)
+                J1.changement_direction(event.key,params.touches)
                 J1.deplacement()
                 J1.voir()
 
