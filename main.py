@@ -65,7 +65,7 @@ def partie(taille_laby=(10,10),mode_de_jeu="solo",
 
     # boucle principale :
     Sortie = False
-    Defaite = False
+    Defaite = True
     duree_totale = 0
 
     print("lancement de la boucle principale")
@@ -87,6 +87,7 @@ def partie(taille_laby=(10,10),mode_de_jeu="solo",
 
                 if(J1.get_case_absolue() == Labyr.sortie):
                     print("Vous avez gagné !")
+                    Defaiite = False
                     Sortie = True
                 
                 if len(joueurs)>1:
