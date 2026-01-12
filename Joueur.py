@@ -20,6 +20,7 @@ class Joueur:
         self.visu_actuel = set() # ensemble des indices de cases visibles actuellement
         self.cases_vues = set() # ensemble des indices de cases déjà vues
         self.reflexion = reflection # "humain" ou le mode de reflexion de l'IA ("aléatoire","profondeur","explorateur")
+        self.asynchrone = False # indique si le joueur est asynchrone (utile pour les robots)
         if(self.reflexion == "explorateur"):
             self.taux_exploration_cases = {}# dictionnaire qui quantifie le taux d'exploration de chaque case
     def changement_direction(self,key,touches=None) -> None:
@@ -76,6 +77,13 @@ class Joueur:
             self.visu_actuel = self.visu_actuel.union(self.labyrinthe.cases[self.get_case_absolue()].visibles[direction])
             self.cases_vues = self.cases_vues.union(self.visu_actuel)
     
+    def se_mouvoir(self)->None:
+        self.set_direction(self.choisir_case())
+        self.deplacement()
+
+    def set_direction(self,dir:int)->None:
+        self._direction = dir
+
     def choisir_case(self)->int:
         """Choisit un indice de case parmi les cases voisines en fonction de la réflexion choisie"""
         if self.reflexion == "aléatoire":

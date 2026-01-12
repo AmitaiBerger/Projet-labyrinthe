@@ -9,18 +9,17 @@ pygame.init()
 import Joueur
 from dataclasses import dataclass
 from enum import Enum
+from typing import Union
 
 class Type_Joueur(Enum):
     HUMAIN = 1
     ROBOT_ALEATOIRE = 2
     ROBOT_EXPLORATEUR =3
-    #ROBOT_ALEATOIRE_ASYNC = 4
-    #ROBOT_EXPLORATEUR_ASYNC = 5
 
 
 @dataclass
 class Parametres:
-    joueurs:list[Type_Joueur]#=[Type_Joueur.HUMAIN]
+    joueurs:list[Union[Type_Joueur,tuple(Type_Joueur, float)]]#=[Type_Joueur.HUMAIN]
     touches:list[type(pygame.K_z)]# = [pygame.K_RIGHT,pygame.K_UP,pygame.K_LEFT,pygame.K_DOWN]
 
     #param graphiques
@@ -58,7 +57,8 @@ def partie(params:Parametres=Parametres(joueurs=[Type_Joueur.HUMAIN],touches=[py
     joueurs = []
 
     for joueur_type in params.joueurs:
-        match joueur_type:
+        typ = joueur_type if isinstance(joueur_type,Type_Joueur) else typ = joueur_type[0]
+        match typ:
             case Type_Joueur.HUMAIN:
                 if mode_de_jeu=="solo":
                     # création du Joueur :
@@ -77,6 +77,20 @@ def partie(params:Parametres=Parametres(joueurs=[Type_Joueur.HUMAIN],touches=[py
             case Type_Joueur.ROBOT_EXPLORATEUR:
                 BOT = Joueur.Joueur(Labyr,Labyr.cases[Labyr.joueur2],(0,0,255),4,5,reflection="explorateur")
                 BOT.voir()
+                joueurs.append(BOT)
+            case Type_Joueur.ROBOT_ALEATOIRE_ASYNC:
+                BOT = Joueur.Joueur(Labyr,Labyr.cases[Labyr.joueur2],(0,0,255),4,5,reflection="aleatoire",vitesse=joueur_type[1])
+                BOT.voir()
+                BOT.asynchrone = True
+                BOT.moment_dernier_mvt = 0
+                BOT.mvt_par_sec = joueur_type[1]
+                joueurs.append(BOT)
+            case Type_Joueur.ROBOT_EXPLORATEUR_ASYNC:
+                BOT = Joueur.Joueur(Labyr,Labyr.cases[Labyr.joueur2],(0,0,255),4,5,reflection="aleatoire",vitesse=joueur_type[1])
+                BOT.voir()
+                BOT.asynchrone = True
+                BOT.moment_dernier_mvt = 0
+                BOT.mvt_par_sec = joueur_type[1]
                 joueurs.append(BOT)
     J1 = joueurs[0]
     type_vision = Camera()
@@ -125,8 +139,7 @@ def partie(params:Parametres=Parametres(joueurs=[Type_Joueur.HUMAIN],touches=[py
                     Affichage.effacer_joueur(fenetre,BOT,min(res[0],res[1]),camera=type_vision)
                     
                     
-                    BOT._direction = BOT.choisir_case()
-                    BOT.deplacement()
+                    BOT.se_mouvoir()
                     BOT.voir()
                     
                     if(BOT.get_case_absolue() == Labyr.sortie):
@@ -134,7 +147,26 @@ def partie(params:Parametres=Parametres(joueurs=[Type_Joueur.HUMAIN],touches=[py
                         Sortie = True
                         Defaite = True
 
+        for joueur in joueurs:
+            if joueur.asynchrone:
+                # gestion des déplacements asynchrones
+                temps_actuel = pygame.time.get_ticks()
+                intervalle_entre_mouvements = 1000 / joueur.mvt_par_sec  # en millisecondes
+                if temps_actuel - joueur.moment_dernier_mvt >= intervalle_entre_mouvements:
+                    # il est temps de faire un mouvement
+                    Affichage.effacer_joueur(fenetre,joueur,min(res[0],res[1]),camera=type_vision)
+                    joueur.se_mouvoir()
+                    joueur.voir()
+                    joueur.moment_dernier_mvt = temps_actuel
 
+                    if(joueur.get_case_absolue() == Labyr.sortie):
+                        if joueur == J1:# ne sert à rien pour l'instant
+                            print("Vous avez gagné !")
+                            Defaite = False
+                        else:
+                            print("Le robot a gagné ! Vous avez perdu.")
+                            Defaite = True
+                        Sortie = True
                     
         # dessin éléments :
         
