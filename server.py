@@ -6,16 +6,17 @@ import random
 from Laby import Labyrinthe
 
 # --- CONFIGURATION ---
-MAX_PLAYERS = 2 # Sera modifié par run_server
+MAX_PLAYERS = 2
 current_players = 0
 game_active = False
 winner_id = -1
 Labyr_commun = None
-positions_joueurs = [] # Liste dynamique
+positions_joueurs = []
 server_socket = None
 server_running = False
+connected_ids = []
 
-# --- FONCTIONS RESEAU (Inchangées, garde send_obj/recv_obj/recvall d'avant) ---
+# --- FONCTIONS RESEAU (Inchangées) ---
 def send_obj(sock, data):
     try:
         msg = pickle.dumps(data)
@@ -39,7 +40,6 @@ def recvall(sock, n):
         if not packet: return None
         data.extend(packet)
     return data
-# ------------------------------------------------------------------
 
 def reset_game():
     global Labyr_commun, positions_joueurs, winner_id, game_active
@@ -49,19 +49,21 @@ def reset_game():
     Labyr_commun.creuser_trous_intelligents()
     Labyr_commun.sortie = random.randint(0, len(Labyr_commun.cases) - 1)
     Labyr_commun.cases[Labyr_commun.sortie].est_sortie = True 
-    
-    # Appel de la nouvelle fonction N joueurs
+    Labyr_commun.cases[Labyr_commun.sortie].contenu = "Sortie"
     Labyr_commun.placer_n_joueurs(MAX_PLAYERS, ratio_eloignement=0.7)
-    
-    # On initialise les positions actuelles avec les positions de départ
     positions_joueurs = list(Labyr_commun.joueurs_indices)
     winner_id = -1
     game_active = False
 
 def threaded_client(conn, player_id):
-    global current_players, game_active, winner_id
+    global current_players, game_active, winner_id, connected_ids # <-- AJOUTE connected_ids
+    
+    # AJOUT ICI : On réinitialise la position de ce slot au point de départ
+    # (Pour éviter de reprendre la partie là où le précédent joueur s'est déconnecté)
+    if Labyr_commun and positions_joueurs:
+        positions_joueurs[player_id] = Labyr_commun.joueurs_indices[player_id]
+
     try:
-        # On envoie: (Labyrinthe, mon_id, Nombre_Total_Joueurs)
         send_obj(conn, (Labyr_commun, player_id, MAX_PLAYERS))
     except:
         conn.close(); return
@@ -71,17 +73,14 @@ def threaded_client(conn, player_id):
             data = recv_obj(conn)
             if data is None: break
             
-            # Mise à jour de la position de CE joueur
             positions_joueurs[player_id] = data
             
-            # Démarrage quand la salle est pleine
             if current_players == MAX_PLAYERS and not game_active and winner_id == -1:
                 game_active = True
                 
-            # Victoire
             if game_active and data == Labyr_commun.sortie and winner_id == -1:
                 winner_id = player_id
-                game_active = False # On arrête tout
+                game_active = False
 
             status = "PLAY"
             if winner_id != -1:
@@ -89,22 +88,31 @@ def threaded_client(conn, player_id):
             elif current_players < MAX_PLAYERS:
                 status = "WAIT"
             
-            # On renvoie TOUTES les positions + le status
             reply = (positions_joueurs, status)
             send_obj(conn, reply)
             
         except: break
 
     print(f"Joueur {player_id} parti.")
+    
+    # --- MODIFICATION IMPORTANTE ICI (FIN DE FONCTION) ---
+    connected_ids[player_id] = False # On libère ce slot spécifique (ex: le slot 0 se libère)
     current_players -= 1
+    
+    if not game_active and winner_id == -1:
+        print(f"Une place se libère. En attente : {current_players}/{MAX_PLAYERS}")
+    
     conn.close()
     if server_running and current_players <= 0:
         current_players = 0
         reset_game()
 
 def run_server(nb_joueurs_choisis=2):
-    global server_socket, current_players, server_running, MAX_PLAYERS
-    MAX_PLAYERS = nb_joueurs_choisis # On met à jour le nombre attendu
+    global server_socket, current_players, server_running, MAX_PLAYERS, connected_ids
+    MAX_PLAYERS = nb_joueurs_choisis
+    
+    # Initialisation de la liste des slots (Tous False au début)
+    connected_ids = [False] * MAX_PLAYERS 
     
     server = "0.0.0.0"
     port = 5555
@@ -124,14 +132,28 @@ def run_server(nb_joueurs_choisis=2):
     while server_running:
         try:
             conn, addr = server_socket.accept()
-            if not server_running: 
-                conn.close(); break
+            if not server_running: conn.close(); break
             
-            if current_players >= MAX_PLAYERS:
-                conn.close(); continue
+            # --- NOUVELLE LOGIQUE D'ATTRIBUTION ---
+            # On cherche le premier ID libre (False) dans la liste
+            free_id = -1
+            for i in range(MAX_PLAYERS):
+                if not connected_ids[i]:
+                    free_id = i
+                    break
+            
+            # Si on n'a pas trouvé de place libre (Serveur plein)
+            if free_id == -1:
+                print("Tentative de connexion rejetée : Serveur plein.")
+                conn.close()
+                continue
                 
+            # On valide l'entrée
+            connected_ids[free_id] = True # On marque le slot comme pris
             current_players += 1
-            start_new_thread(threaded_client, (conn, current_players - 1))
+            start_new_thread(threaded_client, (conn, free_id))
+            # --------------------------------------
+
         except OSError: break
     print("Serveur Off")
 
