@@ -230,8 +230,9 @@ def partie_reseau(reseau):
                 if nouvelle_case != ancienne_case:
                     # Vérifie si un item a été pris
                     item_pris = None
-                    if nouvelle_case in labyrinthe.items:
-                        item_pris = nouvelle_case
+                    """if labyrinthe.items:
+                        if nouvelle_case in labyrinthe.items:
+                            item_pris = nouvelle_case"""
                     
                     reseau.send(("MOVE", nouvelle_case, item_pris))
         
@@ -277,7 +278,7 @@ def partie_reseau(reseau):
         
         # Mise à jour de la vision
         joueur_local.visu_actuel = set([joueur_local.get_case_absolue()])
-        labyrinthe.calculer_visibilite()
+        #labyrinthe.visibles()
         case_actuelle = labyrinthe.cases[joueur_local.get_case_absolue()]
         for direction in case_actuelle.visibles:
             joueur_local.visu_actuel.update(case_actuelle.visibles[direction])

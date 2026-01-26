@@ -21,7 +21,7 @@ class Reseau:
 
     def send(self, data):
         try:
-            self.send_obj(data)
+            self.env_obj(data)
             return self.recv_obj()
         except socket.error as e:
             print(e)
@@ -34,10 +34,10 @@ class Reseau:
         self.client.sendall(length + msg)
 
     def recv_obj(self):
-        raw_msglen = self.recvall(4)
+        raw_msglen = self.recvtout(4)
         if not raw_msglen: return None
         msglen = struct.unpack('>I', raw_msglen)[0]
-        return pickle.loads(self.recvall(msglen))
+        return pickle.loads(self.recvtout(msglen))
 
     def recvtout(self, n):
         data = bytearray()

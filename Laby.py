@@ -150,7 +150,7 @@ class Labyrinthe():
     def placer_n_joueurs(self, n, ratio_eloignement=0.7):
         if self.sortie == -1: return
         self.joueurs_indices_depart = []
-        dists_sortie = self.calculer_toutes_distances(self.sortie)
+        dists_sortie = self._calculer_toutes_distances(self.sortie)
         max_dist = max([d for d in dists_sortie.values() if d != float('inf')], default=1)
         seuil = int(max_dist * ratio_eloignement)
 
@@ -162,7 +162,7 @@ class Labyrinthe():
                 if idx == self.sortie: continue
                 score = dist 
                 if self.joueurs_indices_depart:
-                    dists_autres = [self.calculer_toutes_distances(j)[idx] for j in self.joueurs_indices_depart]
+                    dists_autres = [self._calculer_toutes_distances(j)[idx] for j in self.joueurs_indices_depart]
                     min_dist_autres = min(dists_autres)
                     score += min_dist_autres * 2 
                 candidats.append((idx, score))

@@ -59,6 +59,8 @@ def reinitialiser_jeu():
     Labyr_commun.sortie = random.randint(0, len(Labyr_commun.cases)-1)
     Labyr_commun.cases[Labyr_commun.sortie].est_sortie = True
     Labyr_commun.cases[Labyr_commun.sortie].contenu = "Sortie"
+
+    Labyr_commun.visibles()
     
     #Labyr_commun.placer_items() # Ajout Phase 2
     
