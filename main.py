@@ -594,7 +594,7 @@ if __name__=="__main__":
 
     largeur_rect = LARGEUR//6
     hauteur_rect = HAUTEUR//10
-    dist_inter_rect = 10
+    dist_inter_rect = 30
     
     police_nationale = pygame.font.SysFont('Corbel',res[1]//10) 
     """text_click = police_nationale.render("jeu Solo", 1, (0,0,0))
