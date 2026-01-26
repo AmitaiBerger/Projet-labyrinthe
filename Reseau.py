@@ -48,4 +48,4 @@ class Reseau:
         return data
 
     def fermer(self):
-        self.client.fermer()
+        self.client.close()
