@@ -9,6 +9,7 @@ from Laby import Labyrinthe
 from config import *
 import pickle
 import struct
+from config_globale import *
 
 # --- RÉSEAU ---
 def envoyer_obj(sock, donnees):
@@ -52,7 +53,7 @@ evenements_jeu = []
 def reinitialiser_jeu():
     global Labyr_commun, positions_joueurs, id_gagnant, partie_active, evenements_jeu
     print(f">>> GÉNÉRATION LABYRINTHE ({NB_JOUEURS_MAX} joueurs) <<<")
-    Labyr_commun = Labyrinthe(15, 15)
+    Labyr_commun = Labyrinthe(DEFAULT_LABY_SIZE[0], DEFAULT_LABY_SIZE[1])
     Labyr_commun.generer_par_Wilson()
     Labyr_commun.creuser_trous_intelligents()
     
