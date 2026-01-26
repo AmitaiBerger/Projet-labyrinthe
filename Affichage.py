@@ -4,6 +4,17 @@ import pygame
 import math
 import Joueur
 from dataclasses import dataclass
+from config_globale import *
+
+# affichage menus
+def draw_text_box(surf, text, font, x, y, bg_col=WHITE, txt_col=BLACK):
+    t = font.render(str(text), True, txt_col)# on aurait pu prerender le texte
+    rect = t.get_rect(center=(x,y))
+    bg = rect.inflate(20, 10)
+    pygame.draw.rect(surf, bg_col, bg, border_radius=5)
+    pygame.draw.rect(surf, BLACK, bg, 2, border_radius=5)
+    surf.blit(t, rect)
+    return bg
 
 class Fenetre:
     def __init__(self):
@@ -20,6 +31,8 @@ class Fenetre:
         fen.but1.pack()
 
         root.mainloop()
+
+# affichage dans le jeu
 
 @dataclass
 class Camera:
@@ -111,6 +124,7 @@ def effacer_joueur(fond,joueur,taille_laby,camera=None,couleur_fond=(255, 255,25
     else:
         print("camera.centrage=",camera.centrage)
         raise ValueError("type de centrage inconnu pour l'effacement du joueur")"""
+
 def affiche_ensemble_de_cases(fond,labyrinthe,ensemble_cases,taille_laby,coul_mur=(0,0,0),directionnel=False,camera=None):
     """utilise pygame pour afficher un ensemble de cases
     ensemble_cases est un ensemble d'indices de cases

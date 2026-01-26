@@ -1,7 +1,7 @@
 import pygame
 import random
 
-from global_data import *
+from config_globale import *
 
 
 class Joueur:
@@ -23,7 +23,7 @@ class Joueur:
         self.asynchrone = False # indique si le joueur est asynchrone (utile pour les robots)
         if(self.reflexion == "explorateur"):
             self.taux_exploration_cases = {}# dictionnaire qui quantifie le taux d'exploration de chaque case
-        if not self.reflection=="humain":
+        if not self.reflexion=="humain":
             self.voit_culs_de_sac = True
             self.culs_de_sac = set() # ensemble des indices de cases qui sont des culs de sac
         else:

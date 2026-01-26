@@ -147,6 +147,34 @@ class Labyrinthe():
         else:
             return None
 
+    def placer_n_joueurs(self, n, ratio_eloignement=0.7):
+        if self.sortie == -1: return
+        self.joueurs_indices_depart = []
+        dists_sortie = self.calculer_toutes_distances(self.sortie)
+        max_dist = max([d for d in dists_sortie.values() if d != float('inf')], default=1)
+        seuil = int(max_dist * ratio_eloignement)
+
+        for i in range(n):
+            candidats = []
+            for idx, dist in dists_sortie.items():
+                if dist < seuil: continue
+                if idx in self.joueurs_indices_depart: continue
+                if idx == self.sortie: continue
+                score = dist 
+                if self.joueurs_indices_depart:
+                    dists_autres = [self.calculer_toutes_distances(j)[idx] for j in self.joueurs_indices_depart]
+                    min_dist_autres = min(dists_autres)
+                    score += min_dist_autres * 2 
+                candidats.append((idx, score))
+            
+            if candidats:
+                candidats.sort(key=lambda x: x[1], reverse=True)
+                top = candidats[:max(1, len(candidats)//10)]
+                choix = random.choice(top)[0]
+                self.joueurs_indices_depart.append(choix)
+            else:
+                self.joueurs_indices_depart.append(0)
+
     def generer_par_Wilson(self):
         """crée un labyrinthe avec l'algorithme de Wilson.
         documentaiton en anglais :
