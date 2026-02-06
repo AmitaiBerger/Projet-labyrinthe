@@ -168,7 +168,7 @@ def affiche_fenetre_defaite():
 # --- CŒUR DU JEU ---
 
 def partie(taille_laby=(10,10), mode_de_jeu="solo", ip_serveur="localhost",
-        coul_fond=(255,255,255), debug=False):
+        coul_fond=(255,255,255), debug=False, niveau_robot_intelligent=False, vitesse_bot=250):
     
     pygame.init() 
     res = (720,720)
@@ -223,6 +223,7 @@ def partie(taille_laby=(10,10), mode_de_jeu="solo", ip_serveur="localhost",
             Labyr.placer_deux_joueurs(ratio_eloignement=0.6)
             J_Moi = Joueur.Joueur(Labyr,Labyr.cases[Labyr.joueur1],(255,0,0),4,5)
             J_Moi.voir(); joueurs.append(J_Moi)
+            # Le robot est ajouté
             BOT = Joueur.Joueur(Labyr,Labyr.cases[Labyr.joueur2],(0,0,255),4,5)
             joueurs.append(BOT)
 
@@ -243,9 +244,26 @@ def partie(taille_laby=(10,10), mode_de_jeu="solo", ip_serveur="localhost",
     ip_affichage = ip_serveur
     if ip_serveur == "localhost" or ip_serveur == "127.0.0.1":
         ip_affichage = get_local_ip()
+    
+    dernier_move_robot = 0
 
     while not Sortie:
         can_move = True
+        temps_actuel = pygame.time.get_ticks() # Récupérer le temps actuel
+
+        # --- GESTION DU ROBOT ---
+        if mode_de_jeu == "robot" and not Defaite:
+            # On utilise vitesse_bot ici
+            if temps_actuel - dernier_move_robot > vitesse_bot:
+                
+                # On passe niveau_robot_intelligent à la méthode (qui sera True dans les 2 cas maintenant)
+                BOT.bot_move(intelligent=niveau_robot_intelligent) 
+                
+                dernier_move_robot = temps_actuel
+                
+                if BOT.get_case_absolue() == Labyr.sortie:
+                    affiche_fenetre_defaite()
+                    Sortie = True
         
         # 1. GESTION RESEAU
         if mode_de_jeu == "reseau":
@@ -344,12 +362,15 @@ if __name__=="__main__":
     x_center = LARGEUR//2 - largeur_btn//2
     
     rect_solo = pygame.Rect(x_center, start_y, largeur_btn, hauteur_btn)
-    rect_robot = pygame.Rect(x_center, start_y + 1*(hauteur_btn+espacement), largeur_btn, hauteur_btn)
+    largeur_demi = (largeur_btn - 10) // 2
+    rect_robot_facile = pygame.Rect(x_center, start_y + 1*(hauteur_btn+espacement), largeur_demi, hauteur_btn)
+    rect_robot_malin = pygame.Rect(x_center + largeur_demi + 10, start_y + 1*(hauteur_btn+espacement), largeur_demi, hauteur_btn)
     rect_host = pygame.Rect(x_center, start_y + 2*(hauteur_btn+espacement), largeur_btn, hauteur_btn)
     rect_join = pygame.Rect(x_center, start_y + 3*(hauteur_btn+espacement), largeur_btn, hauteur_btn)
     rect_quit = pygame.Rect(x_center, start_y + 4*(hauteur_btn+espacement), largeur_btn, hauteur_btn)
 
     police_corbel = pygame.font.SysFont('Corbel', 45)
+    police_petite = pygame.font.SysFont('Corbel', 30)
 
     mode_host_actif = False
     server_thread = None
@@ -364,8 +385,14 @@ if __name__=="__main__":
                 if event.type == pygame.MOUSEBUTTONUP:
                     if rect_solo.collidepoint(pos_souris):
                         partie((15,15), "solo"); fenetre = pygame.display.set_mode(res)
-                    elif rect_robot.collidepoint(pos_souris):
-                        partie((15,15), "robot"); fenetre = pygame.display.set_mode(res)
+                    elif rect_robot_facile.collidepoint(pos_souris):
+                        # On lance en mode robot avec intelligent=False
+                        partie((15,15), "robot", niveau_robot_intelligent=True, vitesse_bot=500)
+                        fenetre = pygame.display.set_mode(res)
+                    elif rect_robot_malin.collidepoint(pos_souris):
+                        # On lance en mode robot avec intelligent=True
+                        partie((15,15), "robot", niveau_robot_intelligent=True, vitesse_bot=250)
+                        fenetre = pygame.display.set_mode(res)
                     
                     elif rect_host.collidepoint(pos_souris):
                         nb = affiche_fenetre_nb_joueurs()
@@ -392,14 +419,28 @@ if __name__=="__main__":
             if image_fond: fenetre.blit(image_fond, (0, 0))
             else: fenetre.fill((255,255,255))
             
-            boutons = [
-                (rect_solo, "Solo", coul_bouton_clair),
-                (rect_robot, "VS Robot", coul_bouton_clair),
+            # Solo
+            pygame.draw.rect(fenetre, coul_bouton_clair, rect_solo)
+            txt_s = police_corbel.render("Solo", True, (0,0,0))
+            fenetre.blit(txt_s, (rect_solo.centerx - txt_s.get_width()//2, rect_solo.centery - txt_s.get_height()//2))
+
+            # --- DESSIN DES DEUX BOUTONS ROBOT ---
+            pygame.draw.rect(fenetre, (255,255,220), rect_robot_facile) # Vert clair
+            txt_rf = police_petite.render("Bot facile", True, (0,0,0))
+            fenetre.blit(txt_rf, (rect_robot_facile.centerx - txt_rf.get_width()//2, rect_robot_facile.centery - txt_rf.get_height()//2))
+
+            pygame.draw.rect(fenetre, (255,220,220), rect_robot_malin) # Rouge clair
+            txt_rm = police_petite.render("Bot difficile", True, (0,0,0))
+            fenetre.blit(txt_rm, (rect_robot_malin.centerx - txt_rm.get_width()//2, rect_robot_malin.centery - txt_rm.get_height()//2))
+            # -------------------------------------
+
+            # Host, Join, Quit
+            boutons_standard = [
                 (rect_host, "Héberger", coul_bouton_reseau),
                 (rect_join, "Rejoindre", coul_bouton_reseau),
-                (rect_quit, "Quitter", coul_bouton_clair)
+                (rect_quit, "Quitter", (255, 120, 120))
             ]
-            for rect, texte, couleur in boutons:
+            for rect, texte, couleur in boutons_standard:
                 pygame.draw.rect(fenetre, couleur, rect)
                 txt_surf = police_corbel.render(texte, True, (0,0,0))
                 fenetre.blit(txt_surf, (rect.centerx - txt_surf.get_width()//2, rect.centery - txt_surf.get_height()//2))

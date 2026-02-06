@@ -1,4 +1,5 @@
 import pygame
+import random
 from global_data import *
 
 class Joueur:
@@ -16,6 +17,9 @@ class Joueur:
         self.labyrinthe = labyrinthe
         self.visu_actuel = set() # ensemble des indices de cases visibles actuellement
         self.cases_vues = set() # ensemble des indices de cases déjà vues
+        self.cases_explorees = set() # pour le robot intelligent
+        self.cases_explorees.add(self.get_case_absolue()) # pour le robot intelligent
+        self.chemin_retour = [] # pour le robot intelligent
         
     def changement_direction(self,key,touches=None) -> None:
         """
@@ -72,3 +76,77 @@ class Joueur:
             if direction in self.labyrinthe.cases[self.get_case_absolue()].visibles:
                 self.visu_actuel = self.visu_actuel.union(self.labyrinthe.cases[self.get_case_absolue()].visibles[direction])
         self.cases_vues = self.cases_vues.union(self.visu_actuel)
+
+    def bot_move(self, intelligent=False):
+        """
+        Gère le déplacement automatique.
+        intelligent=False : Robot aléatoire.
+        intelligent=True  : Robot explorateur (DFS / Backtracking).
+        """
+        # On marque l'endroit où on se trouve comme "Exploré"
+        idx_actuel = self.get_case_absolue()
+        self.cases_explorees.add(idx_actuel)
+
+        # 1. Identifier les murs et passages ouverts
+        directions_valides = []
+        for i in range(4):
+            if self._case.voisins[i]: 
+                directions_valides.append(i)
+        
+        if not directions_valides: return 
+
+        if not intelligent:
+            # --- MODE FACILE (Aléatoire) ---
+            self._direction = random.choice(directions_valides)
+            self.deplacement()
+            self.voir()
+            return
+
+        # --- MODE MALIN (Exploration Méthodique) ---
+        
+        # On cherche les voisins accessibles qu'on n'a JAMAIS visités physiquement
+        candidats_inconnus = []
+        for d in directions_valides:
+            # Calcul de l'indice du voisin
+            idx_cible = -1
+            if d == 0: idx_cible = idx_actuel + 1
+            elif d == 1: idx_cible = idx_actuel - self.labyrinthe.largeur
+            elif d == 2: idx_cible = idx_actuel - 1
+            elif d == 3: idx_cible = idx_actuel + self.labyrinthe.largeur
+            
+            # C'est ici que ça change : on vérifie cases_explorees, PAS cases_vues
+            if idx_cible not in self.cases_explorees:
+                candidats_inconnus.append(d)
+
+        if candidats_inconnus:
+            # CAS 1 : On avance vers l'inconnu
+            # On note qu'on vient d'ici (pour le retour)
+            self.chemin_retour.append(idx_actuel)
+            
+            choix = random.choice(candidats_inconnus)
+            self._direction = choix
+            self.deplacement()
+        
+        elif self.chemin_retour:
+            # CAS 2 : Cul-de-sac ou zone connue -> On REBROUSSE CHEMIN
+            # On récupère la dernière intersection visitée
+            case_retour = self.chemin_retour.pop()
+            
+            # On trouve la direction pour y aller
+            dir_retour = self.labyrinthe.direction(idx_actuel, case_retour)
+            
+            if dir_retour is not None:
+                self._direction = dir_retour
+                self.deplacement()
+            else:
+                # Sécurité (ne devrait pas arriver si le chemin est continu)
+                self._direction = random.choice(directions_valides)
+                self.deplacement()
+        else:
+            # CAS 3 : Labyrinthe entièrement exploré ou bloqué au départ
+            # On bouge au hasard pour ne pas planter
+            self._direction = random.choice(directions_valides)
+            self.deplacement()
+
+        # Mise à jour de la vision (pour l'affichage)
+        self.voir()
