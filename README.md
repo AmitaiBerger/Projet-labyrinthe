@@ -2,6 +2,10 @@
 
 Voici le Projet de jeu de labyrinthe.
 
+
+Durant les jeu, les joueurs utilisent les flèches de leur clavier pour déplacer leur personnage dans un labyrinthe généré aléatoirement, jusqu'à trouver la sortie. Ils cherchent à le faire en un temps minimal ou bien avant un adversaire, humain ou algorithmique.
+
+
 Pour lancer menu principal du jeu, lancer le fichier main.
 
 Plusieurs modes de jeu sont proposés:
@@ -14,4 +18,3 @@ Dans un premier temps, il faut que tous les joueurs (entre 2 et 9) soient sur la
 
 Pour naviguer dans les menus, la touche échap permet de revenir au menu principal, sauf pour l'hebergeur qui doit appuyer sur le bouton arrêter le serveur
 
-Bon jeu!
