@@ -13,6 +13,8 @@ Plusieurs modes de jeu sont proposés:
 - un mode contre un robot intelligent qui trouve la sortie plus ou moins rapidement suivant la difficulté
 - un mode réseau détaillé plus bas
 
+![exemple de gameplay](https://github.com/AmitaiBerger/Projet-labyrinthe/blob/main/ressources/exemple%20jeu.png)
+
 ## Mode réseau
 Dans un premier temps, il faut que tous les joueurs (entre 2 et 9) soient sur la même connection internet, puis un des joueurs va héberger le serveur sur sa machine, et tous les autres joueurs pourront s'y connecter en rentrant l'adresse IP de l'hébergeur, qui sera affichée lorsuqu'il créera le serveur via le bouton héberger
 
