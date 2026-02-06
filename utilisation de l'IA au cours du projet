@@ -1,9 +1,9 @@
-Séance 1 :
-  pas d'utilisation de l'IA lors de la séance (qui aurait pu servir à implméneter l'algorithme de Wilson).
 
-Séance 2: 
-  Utilisation de ChatGPT pour manier la bibliothèque pygame (plus facile que de lire toute la documentation).
-  Et aussi pour créer quelques fonctions peu intéréssantes comme direction ou afficher_comme_texte
+Utilisation de ChatGPT pour manier la bibliothèque pygame (plus facile que de lire toute la documentation).
+Et aussi pour créer quelques fonctions peu intéréssantes comme direction ou afficher_comme_texte
 
+utilisation de l'autoremplissage par copilot pour les fonctions graphiques (placement des rectangles/boutons et textes en fonction des placements de autres).
 
-séance 5 janvier : utilisation de l'autoremplissage par copilot pour les fonctions graphiques (placement des rectangles/boutons et textes en fonction des placements de autres).
+Utilisation de l'ia pour aider à coder le serveur qui était un chose tout à fait nouvelle en terme de syntaxe
+
+De façon générale, l'ia a été utilisée pour certaines tâches fastidieuses dont nous savions exactement coment les coder afin de gagner du temps, et aussi pour aider au debugage
