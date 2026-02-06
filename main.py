@@ -52,15 +52,20 @@ def obtenir_ip_locale():
 
 def afficher_fenetre_ip():
     """Fenêtre pour saisir l'adresse IP du serv"""
+
+    return afficher_fenetre_formulaire(type_alphanumerique="tout",message="IP du serveur :",
+                                titre_fenetre="Connexion au serveur", police=pygame.font.SysFont('Corbel', 30),
+                                par_defaut="localhost")
+
+def afficher_fenetre_formulaire(type_alphanumerique="nombre petit",message="",titre_fenetre="",police = pygame.font.SysFont('Corbel', 30),par_defaut="",borne_sup=9,borne_inf=2):
+    """affiche une fenetre avec un bloc de teste à remplir"""
     pygame.init()
     fenetre = pygame.display.set_mode((500, 200))
-    pygame.display.set_caption("Connexion au serveur")
-    
-    ip_saisie = "localhost"
+    pygame.display.set_caption(titre_fenetre)
+    saisie = par_defaut
     saisie_active = True
-    police = pygame.font.SysFont('Corbel', 30)
     clock = pygame.time.Clock()
-    
+
     while saisie_active:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -69,16 +74,23 @@ def afficher_fenetre_ip():
             
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RETURN:
-                    saisie_active = False
-                elif event.key == pygame.K_BACKSPACE:
-                    ip_saisie = ip_saisie[:-1]
+                    if type_alphanumerique=="nombre petit":
+                        if saisie.isdigit() and borne_inf <= int(saisie) <= borne_sup:
+                            saisie_active = False
+                    elif type_alphanumerique=="tout":
+                        saisie_active = False
+                elif event.key == pygame.K_BACKSPACE and len(saisie)>0:
+                    saisie = saisie[:-1]
                 elif event.key == pygame.K_ESCAPE:
                     return None
-                else:
-                    ip_saisie += event.unicode
+                elif type_alphanumerique=="nombre petit":
+                    if event.unicode.isdigit():
+                        saisie += event.unicode
+                elif type_alphanumerique == "tout":
+                    saisie += event.unicode
         
         fenetre.fill((30, 30, 30))
-        texte = police.render(f"IP du serveur: {ip_saisie}", True, (255, 255, 255))
+        texte = police.render(message+" "+str(saisie), True, (255, 255, 255))
         instruction = police.render("Appuyez sur ENTRÉE pour valider", True, (200, 200, 200))
         
         fenetre.blit(texte, (20, 80))
@@ -87,47 +99,17 @@ def afficher_fenetre_ip():
         clock.tick(30)
     
     pygame.display.quit()
-    return ip_saisie
+    return saisie
+
 
 def afficher_fenetre_nb_joueurs():
     """Fenêtre pour choisir le nombre de joueurs"""
-    pygame.init()
-    fenetre = pygame.display.set_mode((500, 200))
-    pygame.display.set_caption("Nombre de joueurs")
+
+    resultat = afficher_fenetre_formulaire("nombre petit","nombre de joueurs (2-9) :","Nombre de joueurs",pygame.font.SysFont('Corbel', 30),"2",9,2)
     
-    nb_saisi = "2"
-    saisie_active = True
-    police = pygame.font.SysFont('Corbel', 30)
-    clock = pygame.time.Clock()
-    
-    while saisie_active:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                saisie_active = False
-                return None
-            
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_RETURN:
-                    if nb_saisi.isdigit() and 2 <= int(nb_saisi) <= 9:
-                        saisie_active = False
-                elif event.key == pygame.K_BACKSPACE:
-                    nb_saisi = nb_saisi[:-1]
-                elif event.key == pygame.K_ESCAPE:
-                    return None
-                elif event.unicode.isdigit():
-                    nb_saisi += event.unicode
-        
-        fenetre.fill((30, 30, 30))
-        texte = police.render(f"Nombre de joueurs (2-9): {nb_saisi}", True, (255, 255, 255))
-        instruction = police.render("Appuyez sur ENTRÉE pour valider", True, (200, 200, 200))
-        
-        fenetre.blit(texte, (20, 80))
-        fenetre.blit(instruction, (20, 120))
-        pygame.display.update()
-        clock.tick(30)
     
     pygame.display.quit()
-    return int(nb_saisi) if nb_saisi.isdigit() else 2
+    return int(resultat) if resultat.isdigit() else 2
 
 def heberger():
     """Lance un serveur local et s'y connecte'"""
